@@ -1,0 +1,221 @@
+<link rel="import"
+    href="../polymer/polymer.html">
+<link rel="import"
+    href="../paper-slider/paper-slider.html">
+<link rel="import"
+    href="../iron-icons/iron-icons.html">
+
+<!--
+`acre-editable-image-input`
+
+
+@demo demo/acre-editable-image-input.html
+-->
+
+<dom-module id="acre-editable-image-input">
+  <template>
+    <style>
+       :host {
+        display: block;
+        overflow: hidden;
+        position: relative;
+        min-height: 200px;
+        min-width: 200px;
+        height: auto;
+        width: 100%;
+      }
+
+      [hidden] {
+        display: none!important;
+      }
+
+      .image-canvas {
+        overflow: hidden;
+        width: inherit;
+        height: inherit;
+      }
+
+      #imageItem {
+        vertical-align: bottom;
+        width: inherit;
+        height: inherit;
+      }
+
+      paper-slider {
+        width: 100%;
+      }
+
+      paper-slider.size {
+        --paper-slider-knob-color: var(--paper-red-500);
+        --paper-slider-active-color: var(--paper-red-500);
+      }
+
+      paper-slider.positiony {
+        --paper-slider-knob-color: var(--paper-green-500);
+        --paper-slider-active-color: var(--paper-green-500);
+      }
+
+      paper-slider.positionY {
+        --paper-slider-knob-color: var(--paper-light-blue-500);
+        --paper-slider-active-color: var(--paper-light-blue-500);
+      }
+
+      .image-controllers {
+        bottom: 0;
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.32);
+        width: 100%;
+        padding: 10px;
+        font-weight: bold;
+        color: white;
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        @apply(--layout-vertical);
+      }
+
+      .image-input {
+        top: 0;
+        right: 0;
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.32);
+        padding: 10px;
+      }
+
+      .slider-item {
+        @apply(--layout-horizontal);
+      }
+
+      .slider-label {
+        width: 50px;
+      }
+
+      iron-icon {
+        cursor: pointer;
+      }
+    </style>
+
+    <div class="image-canvas">
+      <img id="imageItem"
+          src="{{image.url}}">
+    </div>
+
+    <template is="dom-if"
+        if={{editable}}>
+      <div class="image-input"
+          hidden="[[!editable]]">
+        <label>
+          <input
+              style="display: none"
+              type="file"
+              accept="image/*"
+              on-change="_photoLoad" />
+          <iron-icon icon="icons:camera-enhance"></iron-icon>
+        </label>
+      </div>
+      <div class="image-controllers"
+          hidden="[[!editable]]">
+        <div class="slider-item">
+          <span class="slider-label">Tam.</span>
+          <paper-slider id="sizeSlider"
+              value="{{image.scale}}"
+              class="size"
+              min="0"
+              max="10"
+              step=".1"
+              immediate-value="{{image.scale}}"></paper-slider>
+        </div>
+        <div class="slider-item">
+          <span class="slider-label">Pos X.</span>
+          <paper-slider class="positionX"
+              step="1"
+              min="-100"
+              max="100"
+              immediate-value="{{image.positionX}}"></paper-slider>
+        </div>
+        <div class="slider-item">
+          <span class="slider-label">Pos Y.</span>
+          <paper-slider class="positionY"
+              step="1"
+              min="-100"
+              max="100"
+              immediate-value="{{image.positionY}}"></paper-slider>
+        </div>
+      </div>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'acre-editable-image-input',
+
+      properties: {
+        /**
+         * Set if the product can be edited or not
+         * @type Boolean
+         */
+        editable: {
+          type: Boolean,
+          value: true
+        },
+
+        /**
+         * The image
+         * @type {{url, file, scale, positionX, positionY}}
+         */
+        image: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return {
+              scale: 1,
+              positionX: 0,
+              positionY: 0,
+            }
+          }
+        },
+      },
+
+      observers: [
+        // '_imageUrlChanged(image.url)',
+        '_imagePositionChanged(image.scale, image.positionX, image.positionY)',
+      ],
+
+      ready: function() {},
+
+      _imagePositionChanged: function(scale, positionX, positionY) {
+        this.$.imageItem.style.transform = "scale(" + this.image.scale + ") translateX(" + this.image.positionX + "px) translateY(" + this.image.positionY + "px)";
+      },
+
+
+      /**
+       * The `acre-editable-image-input-file-loaded` event is fired whenever the file is loaded
+       *
+       * @event acre-editable-image-input-file-loaded
+       * @param {Image} returns
+       */
+      _photoLoad: function(e) {
+
+        var files = e.target.files;
+        var _this = this;
+
+        for (var i = 0, f; f = files[i]; i++) {
+          if (!f.type.match('image.*'))
+            continue;
+          var reader = new FileReader();
+          reader.onload = (function(theFile) {
+            var _theFile = theFile;
+            return function(e) {
+              _this.set('image.file', _theFile);
+              _this.set('image.url', e.target.result);
+              _this.fire("acre-editable-image-input-file-loaded", {
+                image: _this.image
+              });
+            };
+          })(f);
+          reader.readAsDataURL(f);
+        }
+      }
+
+    });
+  </script>
+</dom-module>

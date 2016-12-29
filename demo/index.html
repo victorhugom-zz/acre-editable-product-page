@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>acre-editable-product-page demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../acre-editable-product-page.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body>
+
+    <!--<div class="vertical-section-container centered">
+      <h3>Basic acre-editable-product-page Demo</h3>
+      <demo-snippet>
+        <template>-->
+          <acre-editable-product-page product-id="586264a0c99b59b424e80dbf"></acre-editable-product-page>
+        <!--</template>
+      </demo-snippet>
+    </div>-->
+
+    <script>
+      document.querySelector("acre-editable-product-page").addEventListener("acre-editable-product-page-save-click", function(e){
+        console.log(e.detail);
+      });
+    </script>
+
+  </body>
+</html>

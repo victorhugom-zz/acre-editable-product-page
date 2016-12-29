@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <title>acre-editable-image-input demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import"
+        href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import"
+        href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import"
+        href="../acre-editable-image-input-list.html">
+    <style is="custom-style"
+        include="demo-pages-shared-styles">
+    </style>
+  </head>
+
+  <body unresolved>
+    <div class="vertical-section-container centered">
+      <h3>Basic acre-editable-image-input Demo</h3>
+      <demo-snippet>
+        <template>
+          <acre-editable-image-input-list style="width: 360px; margin-bottom: 20px;"
+              editable>
+          </acre-editable-image-input-list>
+          <button id="toggleEditable">TOGGLE EDITABLE</button>
+          <script>
+            var toggleEditableButton = document.getElementById("toggleEditable");
+            toggleEditableButton.addEventListener("click", function() {
+              var editablImage = document.querySelector("acre-editable-image-input-list");
+              editablImage.editable = !editablImage.editable;
+            });
+          </script>
+        </template>
+      </demo-snippet>
+    </div>
+  </body>
+</html>

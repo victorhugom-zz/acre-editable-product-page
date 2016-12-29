@@ -1,0 +1,211 @@
+<link rel="import"
+    href="../polymer/polymer.html">
+<link rel="import"
+    href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import"
+    href="../paper-card/paper-card.html">
+<link rel="import"
+    href="../paper-button/paper-button.html">
+<link rel="import"
+    href="../paper-checkbox/paper-checkbox.html">
+<link rel="import"
+    href="../iron-ajax/iron-ajax.html">
+<link rel="import"
+    href="acre-editable-input.html">
+<link rel="import"
+    href="acre-editable-image-input-list.html">
+
+<!--
+`acre-editable-product-page`
+
+Element to show a product page and edit a product
+
+@demo demo/index.html
+-->
+
+<dom-module id="acre-editable-product-page">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+       :host {
+        display: block;
+        --acre-font-big: var(--font-big, 20px);
+        --acre-font-medium: var(--font-medium, 16px);
+        --acre-font-small: var(--font-small, 13px);
+      }
+
+      .product-page-container {
+        @apply (--layout-horizontal);
+        @apply (--layout-center-justified);
+      }
+
+      acre-editable-image-input {
+        margin: 10px;
+        max-width: 500px;
+      }
+
+      .product-data-container {
+        margin: 10px;
+        max-width: 600px;
+      }
+
+      .product-data {
+        margin: 10px 0;
+        min-width: 300px;
+      }
+
+      .product-name {
+        font-size: var(--acre-font-big);
+        line-height: 24px;
+        font-weight: 500;
+      }
+
+      .product-sku {
+        color: #757575;
+        font-size: var(--acre-font-small);
+      }
+
+      .product-price {
+        font-size: var(--acre-font-medium);
+      }
+
+      .product-description {
+        color: #757575;
+        font-size: var(--acre-font-small)
+      }
+
+      .buy-button {
+        margin-top: 10px;
+        width: 200px;
+        cursor: pointer;
+        box-sizing: border-box;
+        border: 2px solid #000;
+        background-color: #FFF;
+        padding: 8px 44px;
+        text-align: center;
+      }
+
+      .buy-button:hover {
+        background-color: rgb(239, 239, 239);
+      }
+
+      @media only screen and (max-device-width: 768px) {
+        .buy-button {
+          width: 100%;
+          position: fixed;
+          bottom: 0;
+          margin: 0;
+          left: 0;
+        }
+      }
+
+      .editable-menu {
+        width: 100%;
+        max-width: 500px;
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        z-index: 2;
+      }
+
+      .editable-header {
+        padding: 20px;
+        border-bottom: 1px solid #c5c5c5;
+      }
+    </style>
+
+    <div class="product-page-container layout horizontal wrap">
+      <acre-editable-image-input-list class="flex"
+          images="{{product.images}}"
+          editable="[[editable]]"></acre-editable-image-input-list>
+      <div class="layout vertical flex product-data-container">
+        <acre-editable-input class="product-data product-name"
+            editable="[[editable]]"
+            value="{{product.name}}"
+            label="Nome do Produto"></acre-editable-input>
+        <acre-editable-input class="product-sku"
+            editable="[[editable]]"
+            value="{{product.sku}}"
+            label="SKU"></acre-editable-input>
+        <div class="layout horizontal product-data product-price">
+          <span>R$&nbsp;</span>
+          <acre-editable-input editable="[[editable]]"
+              value="{{product.price}}"
+              label="Preço"></acre-editable-input>
+        </div>
+        <span>Descrição</span>
+        <acre-editable-input class="product-data product-description"
+            editable="[[editable]]"
+            value="{{product.description}}"
+            label="Descrição"></acre-editable-input>
+        <div class="buy-button">COMPRAR</div>
+      </div>
+    </div>
+
+    <template is="dom-if" if={{showEditablePopover}}>
+      <paper-card class="editable-menu">
+        <div class="editable-header">
+          Editando [[product.name]]
+        </div>
+        <div class="card-content">
+          <paper-checkbox checked="{{editable}}">Editável</paper-checkbox>
+        </div>
+        <div class="card-actions">
+          <paper-button on-tap="_save">Salvar</paper-button>
+        </div>
+      </paper-card>
+    </template>
+  </template>
+
+  <script>
+    Polymer({
+
+        is: 'acre-editable-product-page',
+
+        properties: {
+            /**
+            * Set if the product is can be edited or not
+            * @type Boolean
+            */
+            editable: {
+              type: Boolean,
+              value: false
+            },
+
+            /**
+            * Set if the editable popover is visible or not
+            * @type Boolean
+            */
+            showEditablePopover: {
+              type: Boolean,
+              value: false
+            },
+
+            product: {
+              type: Object,
+              value: function () {
+                return {
+                  name: '',
+                  price: '',
+                  images: [{
+                    scale: 1,
+                    positionX: 0,
+                    positionY: 0,
+                  }],
+                }
+              }
+            },
+          },
+
+          /**
+          * The `acre-editable-product-page-save-click` event is fired whenever the save button is clicked
+          *
+          * @event acre-editable-product-page-save-click
+          * @detail {{product: Product}}
+          */
+          _save: function () {
+            this.fire("acre-editable-product-page-save-click", this.product);
+          },
+
+    });
+  </script>
+</dom-module>

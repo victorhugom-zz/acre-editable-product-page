@@ -1,0 +1,123 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-input/paper-textarea.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+
+<!--
+`acre-editable-input`
+
+Element to provide an input with editable content
+
+@demo demo/acre-editable-input.html
+-->
+
+<dom-module id="acre-editable-input">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      [hidden]{
+        display: none!important;
+      }
+      paper-dialog{
+        max-height: 200px!important;
+        width: 300px!important;
+        overflow-y: auto;
+      }
+      .editable{
+        border-bottom: 1px dashed #8c8c8c;
+      }
+      #editablePlaceholder{
+        color: #8c8c8c;
+      }
+    </style>
+
+    <template is="dom-if" if={{editable}}>
+      <paper-dialog id="editDialog"
+          no-overlap
+          offset="30"
+          horizontal-align="left"
+          vertical-align="top"
+          entry-animation="scale-up-animation"
+          exit-animation="fade-out-animation">
+        <paper-textarea label="{{label}}" value="{{value}}" char-counter></paper-textarea>
+        <paper-button on-tap="_closeDialog">Fechar</paper-button>
+      </paper-dialog>
+    </template>
+
+    <template is="dom-if" if={{editable}}>
+      <span id="editablePlaceholder" class$="{{_cssClass}}"
+            hidden="[[value]]"
+            on-tap="_openDialog">{{label}}</span>
+    </template>
+
+    <span id="editableData" class$="{{_cssClass}}" style$="{{style}}"
+          name="{{name}}" hidden="[[!value]]"
+          on-tap="_openDialog">{{value}}</span>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'acre-editable-input',
+
+      properties: {
+      /**
+       * Set if the input can be editable or not
+       * @type Boolean
+       */
+        editable:{
+          type: Boolean,
+          value: true,
+          observer: "_editableChanged"
+        },
+
+        /**
+        * The input value
+        * @type: String
+        */
+        value: {
+          type: String,
+          value: 'acre-editable-input',
+          notify: true,
+        },
+        _cssClass: {
+          type: String,
+          value: ''
+        }
+      },
+
+      _openDialog: function(e){
+
+        if(!this.editable) return;
+
+        var editableDialog = Polymer.dom(this.root).querySelector('#editDialog');
+        editableDialog.open();
+
+        if(this.value)
+          editableDialog.positionTarget =  Polymer.dom(this.root).querySelector('#editableData');
+        else
+          editableDialog.positionTarget = Polymer.dom(this.root).querySelector('#editablePlaceholder');
+      },
+
+      _closeDialog: function(){
+        var editableDialog = Polymer.dom(this.root).querySelector('#editDialog');
+        editableDialog.close();
+      },
+
+      _editableChanged: function(newValue, oldValue){
+        if(newValue)
+          this.set("_cssClass", "editable");
+        else
+          this.set("_cssClass", "");
+      },
+
+    });
+  </script>
+</dom-module>

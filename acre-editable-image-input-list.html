@@ -1,0 +1,154 @@
+<link rel="import"
+    href="../polymer/polymer.html">
+<link rel="import"
+    href="../iron-image/iron-image.html">
+<link rel="import"
+    href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import"
+    href="../iron-icons/iron-icons.html">
+<link rel="import"
+    href="./acre-editable-image-input.html">
+
+<!--
+`acre-editable-image-input-list`
+
+@demo demo/acre-editable-image-input-list.html
+-->
+
+<dom-module id="acre-editable-image-input-list">
+  <template>
+    <style include="iron-flex-alignment iron-flex">
+       :host {
+        display: block;
+      }
+
+      .image-selector {
+        height: 40px;
+        width: 40px;
+        border: 1px solid #cecece;
+        margin-right: 10px;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .image-item {
+        vertical-align: bottom;
+        width: inherit;
+        height: inherit;
+      }
+
+      .icon {
+        padding: 5px;
+        height: 30px;
+        width: 30px;
+        color: #7d7d7d;
+      }
+    </style>
+
+
+    <div class="layout vertical" style="position: relative">
+      <acre-editable-image-input editable="{{editable}}"
+          image="{{_imageSelected}}"
+          on-image-changed="_imageChanged"></acre-editable-image-input>
+      <div class="layout horizontal"
+          style="margin-top: 10px;">
+        <template is="dom-repeat"
+            items="{{images}}"
+            as="image"
+            index-as="index">
+          <iron-image class="image-selector" on-tap="_selectImage"
+              src="{{image.url}}"
+              preload
+              sizing="cover"></iron-image>
+        </template>
+
+        <template is="dom-if" if={{editable}}>
+          <div style="position: absolute; top: 5px; left: 5px;">
+            <iron-icon icon="clear" on-tap="_removeImage"></iron-icon>
+          </div>
+          <div class="image-selector">
+            <iron-icon class="icon" icon="add" on-tap="_addImage"></iron-icon>
+          </div>
+        </template>
+
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'acre-editable-image-input-list',
+
+      properties: {
+        /**
+         * Set if the product can be edited or not
+         * @type Boolean
+         */
+        editable: {
+          type: Boolean,
+          value: true
+        },
+
+        /**
+         * The images
+         * @type [[{{url, file, scale, positionX, positionY}}]]
+         */
+        images: {
+          type: Array,
+          notify: true,
+          value: function() {
+            return [{
+              scale: 1,
+              positionX: 0,
+              positionY: 0,
+              url: '',
+            }]
+          }
+        },
+
+        _imageSelected: {
+          type: Object,
+          value: null,
+        },
+      },
+
+      ready: function() {
+        this.set('_imageSelected', this.images[0]);
+      },
+
+      _imageChanged: function(e) {
+
+        var index = this.images.indexOf(this._imageSelected);
+        if (index != -1) {
+
+          //not beautifull but everyting else wasnt working
+          this.set("images." + index + ".url", this._imageSelected.url);
+          // var images = this.images;
+          //   this.splice('images', index, 1, this._imageSelected);
+          // this.set('images', []);
+          // this.set('images', images);
+        }
+      },
+
+      _addImage: function(e){
+        this.push("images", {
+          scale: 1,
+          positionX: 0,
+          positionY: 0,
+          url: '',
+        });
+      },
+
+      _selectImage: function(e){
+         this.set('_imageSelected', this.images[e.model.index]);
+      },
+
+      _removeImage: function(e){
+        if(this.images.length > 1){
+          var index = this.images.indexOf(this._imageSelected);
+          this.splice('images', index, 1);
+          this.set('_imageSelected', this.images[0]);
+        }
+      },
+    });
+  </script>
+</dom-module>
