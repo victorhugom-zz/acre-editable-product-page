@@ -36,13 +36,18 @@
               font-size:20px;
             }
           </style>
-          <acre-editable-input class="name" name="name" label="Nome do Produto" value="Nome do Produto">
-
-          </acre-editable-input>
-          <div>
-            <acre-editable-input class="price" name="name" label="Preço" value="500,00"></acre-editable-input>
-          </div>
+          <acre-editable-input id="input1" class="name" name="name" label="Nome do Produto" value="Nome do Produto"></acre-editable-input>
+          <acre-editable-input class="price" name="name" label="Preço" value="500,00"></acre-editable-input>
           <acre-editable-input class="description" name="name" label="Descrição" value="Isso"></acre-editable-input>
+
+          <paper-button id="toggleEditable" style="margin: 20px 0;" raised>Toggle Editable</paper-button>
+          <script>
+            var btn = document.getElementById("toggleEditable");
+            btn.addEventListener("click", function(){
+              var editable = document.querySelector("#input1");
+              editable.editable = !editable.editable;
+            });
+          </script>
         </template>
       </demo-snippet>
     </div>

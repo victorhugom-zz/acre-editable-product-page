@@ -5,6 +5,8 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="acre-editable-shared-styles.html">
 
 <!--
 `acre-editable-input`
@@ -16,14 +18,11 @@ Element to provide an input with editable content
 
 <dom-module id="acre-editable-input">
   <template>
-    <style>
+     <style include="iron-flex-alignment iron-flex acre-editable-shared-styles">
       :host {
         display: block;
       }
 
-      [hidden]{
-        display: none!important;
-      }
       paper-dialog{
         max-height: 200px!important;
         width: 300px!important;
@@ -41,12 +40,14 @@ Element to provide an input with editable content
       <paper-dialog id="editDialog"
           no-overlap
           offset="30"
-          horizontal-align="left"
+          horizontal-align="auto"
           vertical-align="top"
           entry-animation="scale-up-animation"
           exit-animation="fade-out-animation">
-        <paper-textarea label="{{label}}" value="{{value}}" char-counter></paper-textarea>
-        <paper-button on-tap="_closeDialog">Fechar</paper-button>
+        <div class="dialog-container">
+          <paper-textarea id="inputTextArea" label="{{label}}" value="{{value}}" char-counter></paper-textarea>
+          <paper-button class="layout horizontal" on-tap="_closeDialog">Fechar</paper-button>
+        </div>
       </paper-dialog>
     </template>
 
@@ -104,6 +105,11 @@ Element to provide an input with editable content
           editableDialog.positionTarget =  Polymer.dom(this.root).querySelector('#editableData');
         else
           editableDialog.positionTarget = Polymer.dom(this.root).querySelector('#editablePlaceholder');
+
+        var _this = this;
+        setTimeout(function(){
+          Polymer.dom(_this.root).querySelector('#inputTextArea').focus();
+        }, 500);
       },
 
       _closeDialog: function(){

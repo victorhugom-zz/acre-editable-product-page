@@ -8,6 +8,7 @@
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../paper-button/paper-button.html">
 
     <link rel="import" href="../acre-editable-image-input.html">
 
@@ -20,16 +21,16 @@
       <h3>Basic acre-editable-image-input Demo</h3>
       <demo-snippet>
         <template>
-          <acre-editable-image-input style="width: 360px" 
+          <acre-editable-image-input style="width: 360px"
             editable
             image-url="http://www.australiansabroad.com.au/wp-content/uploads/2011/10/brahzil.jpg">
           </acre-editable-image-input>
-          <button id="toggleEditable">TOGGLE EDITABLE</button>
+          <paper-button id="toggleEditable" style="margin: 20px 0" raised>Toggle Editable</paper-button>
           <script>
-            var toggleEditableButton = document.getElementById("toggleEditable");
-            toggleEditableButton.addEventListener("click", function(){
-              var editablImage = document.querySelector("acre-editable-image-input");
-              editablImage.editable = !editablImage.editable; 
+            var btn = document.getElementById("toggleEditable");
+            btn.addEventListener("click", function(){
+              var editable = document.querySelector("acre-editable-image-input");
+              editable.editable = !editable.editable;
             });
             document.querySelector("acre-editable-image-input").addEventListener("acre-editable-image-input-file-loaded", function(e){
                 console.log(e.detail);

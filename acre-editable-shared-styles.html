@@ -1,0 +1,45 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="acre-editable-shared-styles">
+    <template>
+        <style>
+          :root{
+            --acre-font-big: var(--font-big, 20px);
+            --acre-font-medium: var(--font-medium, 16px);
+            --acre-font-small: var(--font-small, 13px);
+          }
+
+          [hidden] {
+            display: none!important;
+          }
+
+          .dialog-container {
+            padding: 15px 15px 5px 15px!important;
+          }
+
+          paper-dialog{
+            --paper-dialog: {
+              max-height: 100%!important;
+              max-width: 312px!important;
+            };
+          }
+
+          paper-dialog > *:first-child {
+            margin: 0!important;
+            padding: 0;
+          }
+
+          paper-dialog > *:last-child {
+            margin: 0!important;
+          }
+
+
+          .data-label {
+            font-size: var(--acre-font-medium);
+            line-height: 24px;
+            font-weight: 500;
+            margin-bottom: 10px;
+          }
+
+        </style>
+    </template>
+</dom-module>

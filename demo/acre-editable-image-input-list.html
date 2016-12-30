@@ -3,15 +3,12 @@
   <head>
     <title>acre-editable-image-input demo</title>
     <meta charset="utf-8">
-    <meta name="viewport"
-        content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import"
-        href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-    <link rel="import"
-        href="../../iron-demo-helpers/demo-snippet.html">
-    <link rel="import"
-        href="../acre-editable-image-input-list.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../paper-button/paper-button.html">
+    <link rel="import" href="../acre-editable-image-input-list.html">
     <style is="custom-style"
         include="demo-pages-shared-styles">
     </style>
@@ -22,15 +19,17 @@
       <h3>Basic acre-editable-image-input Demo</h3>
       <demo-snippet>
         <template>
-          <acre-editable-image-input-list style="width: 360px; margin-bottom: 20px;"
-              editable>
+          <acre-editable-image-input-list
+            style="width: 360px; margin-bottom: 20px;"
+            editable>
           </acre-editable-image-input-list>
-          <button id="toggleEditable">TOGGLE EDITABLE</button>
+
+          <paper-button id="toggleEditable" style="margin: 20px 0" raised>Toggle Editable</paper-button>
           <script>
-            var toggleEditableButton = document.getElementById("toggleEditable");
-            toggleEditableButton.addEventListener("click", function() {
-              var editablImage = document.querySelector("acre-editable-image-input-list");
-              editablImage.editable = !editablImage.editable;
+            var btn = document.getElementById("toggleEditable");
+            btn.addEventListener("click", function(){
+              var editable = document.querySelector("acre-editable-image-input-list");
+              editable.editable = !editable.editable;
             });
           </script>
         </template>

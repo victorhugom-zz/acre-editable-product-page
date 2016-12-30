@@ -1,19 +1,12 @@
-<link rel="import"
-    href="../polymer/polymer.html">
-<link rel="import"
-    href="../iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import"
-    href="../paper-card/paper-card.html">
-<link rel="import"
-    href="../paper-button/paper-button.html">
-<link rel="import"
-    href="../paper-checkbox/paper-checkbox.html">
-<link rel="import"
-    href="../iron-ajax/iron-ajax.html">
-<link rel="import"
-    href="acre-editable-input.html">
-<link rel="import"
-    href="acre-editable-image-input-list.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="acre-editable-shared-styles.html">
+<link rel="import" href="acre-editable-input.html">
+<link rel="import" href="acre-editable-image-input-list.html">
 
 <!--
 `acre-editable-product-page`
@@ -25,7 +18,7 @@ Element to show a product page and edit a product
 
 <dom-module id="acre-editable-product-page">
   <template>
-    <style include="iron-flex iron-flex-alignment">
+    <style include="iron-flex-alignment iron-flex acre-editable-shared-styles">
        :host {
         display: block;
         --acre-font-big: var(--font-big, 20px);
