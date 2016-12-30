@@ -186,8 +186,8 @@ Element to show a product page and edit a product
             productVariations: {
               type: Array,
               value: function () {
-
-              }
+              },
+              observer: '_productVariationsObservable'
             },
 
             _product: {
@@ -199,6 +199,16 @@ Element to show a product page and edit a product
 
           ready: function(){
             this.generateProductFromVariations();
+          },
+
+          /**
+          * Occours when the variations list changes
+          */
+          _productVariationsObservable: function(newValue, oldValue){
+            if(newValue && newValue.length && !oldValue)
+              this.generateProductFromVariations();
+            else if(!this._product)
+              this._product = {};
           },
 
           /**
@@ -225,10 +235,10 @@ Element to show a product page and edit a product
                 product.sizes.push(e.size);
               });
 
-              this._product = product;
+              this.set('_product', product);
 
-              console.log("generate product");
-              console.log(product);
+            }else{
+              this._product = {};
             }
           },
 
@@ -239,6 +249,9 @@ Element to show a product page and edit a product
 
             if(!this._product.productGroupId){
               this._product.productGroupId = guid();
+            }
+            if(!this.productVariations){
+              this.productVariations = [];
             }
 
             var _this = this;
