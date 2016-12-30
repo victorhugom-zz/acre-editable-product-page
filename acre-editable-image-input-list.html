@@ -81,7 +81,8 @@
          */
         editable: {
           type: Boolean,
-          value: true
+          value: true,
+          observer: '_editableObserver'
         },
 
         /**
@@ -108,20 +109,22 @@
       },
 
       ready: function() {
-        this.set('_imageSelected', this.images[0]);
+        if(this.images)
+          this.set('_imageSelected', this.images[0]);
+      },
+
+      _editableObserver: function(newValue, oldValue){
+        if(newValue && newValue != oldValue && this.images.length == 0){
+          this._addImage();
+        }
       },
 
       _imageChanged: function(e) {
 
         var index = this.images.indexOf(this._imageSelected);
         if (index != -1) {
-
           //not beautifull but everyting else wasnt working
           this.set("images." + index + ".url", this._imageSelected.url);
-          // var images = this.images;
-          //   this.splice('images', index, 1, this._imageSelected);
-          // this.set('images', []);
-          // this.set('images', images);
         }
       },
 
