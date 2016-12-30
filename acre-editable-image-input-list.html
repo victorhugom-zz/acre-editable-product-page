@@ -18,6 +18,11 @@
         display: block;
       }
 
+      .image-placeholder{
+        width: 200px;
+        height: 300px;
+        background: #e2e2e2;
+      }
       .image-selector {
         height: 40px;
         width: 40px;
@@ -43,7 +48,10 @@
 
 
     <div class="layout vertical" style="position: relative">
+      <div class="image-placeholder" hidden$="[[_imageSelected]]">
+      </div>
       <acre-editable-image-input editable="{{editable}}"
+          hidden$=[[!_imageSelected]]
           image="{{_imageSelected}}"
           on-image-changed="_imageChanged"></acre-editable-image-input>
       <div class="layout horizontal"
@@ -59,7 +67,7 @@
         </template>
 
         <template is="dom-if" if={{editable}}>
-          <div style="position: absolute; top: 5px; left: 5px;">
+          <div style="position: absolute; top: 5px; left: 5px;" hidden=[[!_imageSelected]]>
             <iron-icon icon="clear" on-tap="_removeImage"></iron-icon>
           </div>
           <div class="image-selector">
@@ -82,7 +90,6 @@
         editable: {
           type: Boolean,
           value: true,
-          observer: '_editableObserver'
         },
 
         /**
@@ -109,14 +116,8 @@
       },
 
       ready: function() {
-        if(this.images)
+        if(this.images && this.images.length)
           this.set('_imageSelected', this.images[0]);
-      },
-
-      _editableObserver: function(newValue, oldValue){
-        if(newValue && newValue != oldValue && this.images.length == 0){
-          this._addImage();
-        }
       },
 
       _imageChanged: function(e) {
@@ -129,12 +130,14 @@
       },
 
       _addImage: function(e){
+        if (!this.images) this.images = [];
         this.push("images", {
           scale: 1,
           positionX: 0,
           positionY: 0,
           url: '',
         });
+        this.set('_imageSelected', this.images[this.images.length -1]);
       },
 
       _selectImage: function(e){
