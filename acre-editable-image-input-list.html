@@ -99,14 +99,7 @@
         images: {
           type: Array,
           notify: true,
-          value: function() {
-            return [{
-              scale: 1,
-              positionX: 0,
-              positionY: 0,
-              url: '',
-            }]
-          }
+          observer: "_imagesObservable"
         },
 
         _imageSelected: {
@@ -115,13 +108,20 @@
         },
       },
 
-      ready: function() {
-        if(this.images && this.images.length)
+      /**
+      * Occours when the image list changes,
+      * if there is just on image, set this one as selected
+      */
+      _imagesObservable: function(newValue, oldValue){
+         if(this.images && this.images.length == 1)
           this.set('_imageSelected', this.images[0]);
       },
 
+      /**
+      * Occours when the image changes,
+      * trigger the observers to update the images list
+      */
       _imageChanged: function(e) {
-
         var index = this.images.indexOf(this._imageSelected);
         if (index != -1) {
           //not beautifull but everyting else wasnt working
@@ -129,6 +129,9 @@
         }
       },
 
+      /**
+      * Add an image to the image list and set is as selected
+      */
       _addImage: function(e){
         if (!this.images) this.images = [];
         this.push("images", {
@@ -140,10 +143,16 @@
         this.set('_imageSelected', this.images[this.images.length -1]);
       },
 
+      /**
+      * When an user tap a image in the list set it as selected
+      */
       _selectImage: function(e){
          this.set('_imageSelected', this.images[e.model.index]);
       },
 
+      /**
+      * Remove a image from the list of images
+      */
       _removeImage: function(e){
         if(this.images.length > 1){
           var index = this.images.indexOf(this._imageSelected);
