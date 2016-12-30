@@ -29,17 +29,18 @@ Element to show a product page and edit a product
 
       .product-page-container {
         @apply (--layout-horizontal);
+        @apply (--layout-wrap);
         @apply (--layout-center-justified);
       }
 
-      acre-editable-image-input {
+      acre-editable-image-input-list {
         margin: 10px;
-        max-width: 500px;
+        max-width: 400px;
       }
 
       .product-data-container {
         margin: 10px;
-        max-width: 600px;
+        max-width: 400px;
       }
 
       .product-data {
@@ -107,7 +108,7 @@ Element to show a product page and edit a product
       }
     </style>
 
-    <div class="product-page-container layout horizontal wrap">
+    <div class="product-page-container">
       <acre-editable-image-input-list class="flex"
           images="{{_product.images}}"
           editable="[[editable]]"></acre-editable-image-input-list>

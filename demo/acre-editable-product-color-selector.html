@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>acre-editable-product-size-selector demo</title>
+    <title>acre-editable-product-color-selector demo</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
@@ -9,7 +9,7 @@
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 
-    <link rel="import" href="../acre-editable-product-size-selector.html">
+    <link rel="import" href="../acre-editable-product-color-selector.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
     </style>
@@ -17,15 +17,15 @@
   <body>
 
     <div class="vertical-section-container centered">
-      <h3>Basic acre-editable-product-size-selector Demo</h3>
+      <h3>Basic acre-editable-product-color-selector Demo</h3>
       <demo-snippet>
         <template>
-          <acre-editable-product-size-selector sizes='["PP"]' editable></acre-editable-product-size-selector>
+          <acre-editable-product-color-selector editable></acre-editable-product-color-selector>
           <paper-button id="toggleEditable" style="margin: 20px 0;" raised>Toggle Editable</paper-button>
           <script>
             var btn = document.getElementById("toggleEditable");
             btn.addEventListener("click", function(){
-              var editable = document.querySelector("acre-editable-product-size-selector");
+              var editable = document.querySelector("acre-editable-product-color-selector");
               editable.editable = !editable.editable;
             });
           </script>

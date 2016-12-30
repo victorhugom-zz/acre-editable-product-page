@@ -34,6 +34,9 @@ Element to provide an input with editable content
       #editablePlaceholder{
         color: #8c8c8c;
       }
+      #editableData, #editablePlaceholder{
+        @apply(--editable-input-data);
+      }
     </style>
 
     <template is="dom-if" if={{editable}}>
@@ -52,14 +55,14 @@ Element to provide an input with editable content
     </template>
 
     <template is="dom-if" if={{editable}}>
-      <span id="editablePlaceholder" class$="{{_cssClass}}"
+      <div id="editablePlaceholder" class$="{{_cssClass}}"
             hidden="[[value]]"
-            on-tap="_openDialog">{{label}}</span>
+            on-tap="_openDialog">{{label}}</div>
     </template>
 
-    <span id="editableData" class$="{{_cssClass}}" style$="{{style}}"
+    <div id="editableData" class$="{{_cssClass}}" style$="{{style}}"
           name="{{name}}" hidden="[[!value]]"
-          on-tap="_openDialog">{{value}}</span>
+          on-tap="_openDialog">{{value}}</div>
 
   </template>
 
@@ -85,9 +88,18 @@ Element to provide an input with editable content
         */
         value: {
           type: String,
-          value: 'acre-editable-input',
+          value: '',
           notify: true,
         },
+
+        /**
+        * The placeholder
+        */
+        label: {
+          type: String,
+          value: ''
+        },
+
         _cssClass: {
           type: String,
           value: ''

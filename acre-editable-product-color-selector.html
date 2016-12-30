@@ -1,0 +1,157 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../paper-swatch-picker/paper-swatch-picker.html">
+<link rel="import" href="acre-editable-input.html">
+<link rel="import" href="acre-editable-shared-styles.html">
+
+<!--
+`acre-editable-product-color-selector`
+
+
+@demo demo/acre-editable-product-color-selector.html
+-->
+
+<dom-module id="acre-editable-product-color-selector">
+  <template>
+     <style include="iron-flex-alignment iron-flex acre-editable-shared-styles">
+      :host {
+        display: block;
+      }
+
+      .color-item[selected]{
+         border: 4px solid #cecece;
+      }
+
+      .color-container{
+        margin: 0 5px 5px 0;
+      }
+
+      .color-item {
+        height: 30px;
+        width: 30px;
+        border: 1px solid #cecece;
+        color: #6f6f6f;
+        cursor: pointer;
+        border-radius: 20px;
+      }
+
+      acre-editable-input{
+        max-width: 60px;
+        --editable-input-data:{
+          text-align: center;
+        }
+      }
+
+      .icon {
+        height: 30px;
+        width: 30px;
+        color: #7d7d7d;
+      }
+
+    </style>
+
+    <div class="data-label">Cores:</div>
+
+
+    <div class="layout horizontal start wrap">
+      <template is="dom-repeat" items={{colors}}
+        as=color index-as=index>
+        <div class="layout vertical center color-container">
+
+          <template is="dom-if" if={{editable}}>
+            <iron-icon class="icon" icon="remove" on-tap="_removeColor"></iron-icon>
+          </template>
+
+          <div class="color-item layout vertical center"
+            style="background-color: [[color.hex]]"
+            on-tap="_selectColor"
+            selected$="{{_isSelected(color, selectedColor)}}">
+          </div>
+
+          <template is="dom-if" if={{editable}}>
+            <paper-swatch-picker color="{{color.hex}}"></paper-swatch-picker>
+          </template>
+          <acre-editable-input class="color-name"
+            value="{{color.name}}"
+            label="name"
+            hidden="[[!showColorLabels]]"
+            editable="[[editable]]"></acre-editable-input>
+
+        </div>
+      </template>
+
+      <template is="dom-if" if="{{editable}}">
+        <div class="color-item" style="margin-top: 30px; margin-left: 5px">
+          <iron-icon class="icon" icon="add" on-tap="_addColor"></iron-icon>
+        </div>
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+      Polymer({
+
+        is: 'acre-editable-product-color-selector',
+
+        properties: {
+          colors: {
+            type: Array,
+            notify: true,
+            value: function () {
+              return []
+            },
+          },
+          /**
+           * Set if the product can be edited or not
+           * @type Boolean
+           */
+          editable: {
+            type: Boolean,
+            value: true
+          },
+          /**
+          * The selected color
+          * @type: String
+          */
+          selectedColor: {
+            type: String,
+            value: '',
+            notify: true
+          }
+        },
+
+        ready: function () {
+
+        },
+
+        /**
+         * The `acre-product-color-selected` event is fired whenever a color is selected
+         *
+         * @event acre-product-color-selected
+         * @param {{color: color}} returns
+         */
+        _selectColor: function (e) {
+          this.set("selectedColor", e.model.color);
+          this.fire('acre-product-color-selected', { color: this.color });
+        },
+
+        _isSelected: function (color, selectedColor) {
+          return color == selectedColor;
+        },
+
+        _addColor: function(){
+          this.push('colors',{
+            name: '',
+            hex: '',
+          });
+        }
+      });
+  </script>
+</dom-module>
