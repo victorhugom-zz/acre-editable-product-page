@@ -7,6 +7,7 @@
 <link rel="import" href="acre-editable-shared-styles.html">
 <link rel="import" href="acre-editable-input.html">
 <link rel="import" href="acre-editable-image-input-list.html">
+<link rel="import" href="acre-editable-product-size-selector.html">
 
 <!--
 `acre-editable-product-page`
@@ -108,27 +109,32 @@ Element to show a product page and edit a product
 
     <div class="product-page-container layout horizontal wrap">
       <acre-editable-image-input-list class="flex"
-          images="{{product.images}}"
+          images="{{_product.images}}"
           editable="[[editable]]"></acre-editable-image-input-list>
       <div class="layout vertical flex product-data-container">
         <acre-editable-input class="product-data product-name"
             editable="[[editable]]"
-            value="{{product.name}}"
+            value="{{_product.name}}"
             label="Nome do Produto"></acre-editable-input>
         <acre-editable-input class="product-sku"
             editable="[[editable]]"
-            value="{{product.sku}}"
+            value="{{_product.sku}}"
             label="SKU"></acre-editable-input>
         <div class="layout horizontal product-data product-price">
           <span>R$&nbsp;</span>
           <acre-editable-input editable="[[editable]]"
-              value="{{product.price}}"
+              value="{{_product.price}}"
               label="Preço"></acre-editable-input>
         </div>
+        <acre-editable-product-size-selector class=" product-data"
+          editable="[[editable]]"
+          sizes="{{_product.sizes}}"
+          selected-size="{{_product.selectedSize}}">
+        </acre-editable-product-size-selector>
         <span>Descrição</span>
         <acre-editable-input class="product-data product-description"
             editable="[[editable]]"
-            value="{{product.description}}"
+            value="{{_product.description}}"
             label="Descrição"></acre-editable-input>
         <div class="buy-button">COMPRAR</div>
       </div>
@@ -173,11 +179,26 @@ Element to show a product page and edit a product
               value: false
             },
 
-            product: {
+            /**
+            * All product variations, you must use this property to set
+            * the product data
+            */
+            productVariations: {
+              type: Array,
+              value: function () {
+
+              }
+            },
+
+            _product: {
               type: Object,
               value: function () {
               }
             },
+          },
+
+          ready: function(){
+            this.generateProductFromVariations();
           },
 
           /**
@@ -187,9 +208,99 @@ Element to show a product page and edit a product
           * @detail {{product: Product}}
           */
           _save: function () {
-            this.fire("acre-editable-product-page-save-click", this.product);
+            this.fire("acre-editable-product-page-save-click", this.generateVariations());
+          },
+
+          /**
+          * Generate a unique product from the variations passed by parameter
+          */
+          generateProductFromVariations: function(){
+            if(this.productVariations && this.productVariations.length){
+
+              var product = Object.assign({}, this.productVariations[0]);
+
+              product.sizes = [];
+              var _this = this;
+              this.productVariations.forEach(function(e) {
+                product.sizes.push(e.size);
+              });
+
+              this._product = product;
+
+              console.log("generate product");
+              console.log(product);
+            }
+          },
+
+          /*
+          * Generate the variations using as base the unique product
+          */
+          generateVariations: function() {
+
+            if(!this._product.variationId){
+              this._product.variationId = guid();
+            }
+
+            var _this = this;
+            this._product.sizes.forEach(function(size){
+
+              //check if there is a variation with this item size
+              var existingVariation = _this.productVariations.filter(function(e){
+                return e.size == size;
+              });
+              if(existingVariation.length) return;
+
+              // copy the main product
+              var productCopy = Object.assign({}, _this._product);
+
+              // remove unecessary properties
+              delete productCopy._id;
+              delete productCopy.sizes;
+              delete productCopy.selectedSize;
+              productCopy.size = size;
+
+              _this.productVariations.push(productCopy);
+            });
+
+            console.log("generated variations");
+            console.log(this.productVariations);
+            return this.productVariations;
           },
 
     });
   </script>
 </dom-module>
+
+<script>
+  function guid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  if (typeof Object.assign != 'function') {
+    Object.assign = function (target, varArgs) { // .length of function is 2
+      'use strict';
+      if (target == null) { // TypeError if undefined or null
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+
+      var to = Object(target);
+
+      for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+
+        if (nextSource != null) { // Skip over if undefined or null
+          for (var nextKey in nextSource) {
+            // Avoid bugs when hasOwnProperty is shadowed
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+      return to;
+    };
+  }
+</script>

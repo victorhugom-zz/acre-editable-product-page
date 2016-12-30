@@ -25,6 +25,8 @@
       .size-selectable-item{
         height: 50px;
         width: 50px;
+        min-width: 50px;
+        min-width: 55px;
         border: 1px solid #ececec;
         color: #6f6f6f;
         cursor: pointer;
@@ -87,7 +89,7 @@
          <div class="layout horizontal wrap">
           <template is="dom-repeat" items={{_availableSizes}}
             as=size index-as=index>
-            <div class="size-selectable-item layout vertical center"
+            <div class="size-selectable-item layout vertical center flex"
               selected$="[[size.selected]]"
               on-tap="_addSizeToList">
               <span style="margin-top: 15px">
@@ -96,7 +98,7 @@
             </div>
           </template>
         </div>
-        <paper-button class="layout horizontal" on-tap="_closeDialog">Fechar</paper-button>
+        <paper-button class="layout horizontal dialog-close-button" on-tap="_closeDialog">Fechar</paper-button>
       </paper-dialog>
     </template>
 
@@ -117,6 +119,7 @@
           },
           sizes: {
             type: Array,
+            notify: true,
             value: function () {
               return []
             },
@@ -130,6 +133,15 @@
             type: Boolean,
             value: true
           },
+          /**
+          * The selected size
+          * @type: String
+          */
+          selectedSize: {
+            type: String,
+            value: '',
+            notify: true
+          }
         },
 
         ready: function () {
