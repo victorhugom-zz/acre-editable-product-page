@@ -24,23 +24,6 @@
         display: block;
       }
 
-      .color-item[selected]{
-         border: 4px solid #cecece;
-      }
-
-      .color-container{
-        margin: 0 5px 5px 0;
-      }
-
-      .color-item {
-        height: 30px;
-        width: 30px;
-        border: 1px solid #cecece;
-        color: #6f6f6f;
-        cursor: pointer;
-        border-radius: 20px;
-      }
-
       acre-editable-input{
         max-width: 60px;
         --editable-input-data:{
@@ -147,6 +130,9 @@
         },
 
         _addColor: function(){
+          if(!this.colors || this.colors.length == 0)
+            this.colors = [];
+
           this.push('colors',{
             name: '',
             hex: '',

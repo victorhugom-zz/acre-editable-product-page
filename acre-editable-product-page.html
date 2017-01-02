@@ -8,6 +8,7 @@
 <link rel="import" href="acre-editable-input.html">
 <link rel="import" href="acre-editable-image-input-list.html">
 <link rel="import" href="acre-editable-product-size-selector.html">
+<link rel="import" href="acre-editable-product-color-selector.html">
 
 <!--
 `acre-editable-product-page`
@@ -104,7 +105,16 @@ Element to show a product page and edit a product
 
       .editable-header {
         padding: 20px;
+        background-color: black;
+        color: white;
         border-bottom: 1px solid #c5c5c5;
+      }
+
+      .selected-color{
+        height: 10px;
+        width: 30px;
+        border: 1px solid #cecece;
+        border-radius: 20px;
       }
     </style>
 
@@ -132,6 +142,10 @@ Element to show a product page and edit a product
           sizes="{{_product.sizes}}"
           selected-size="{{_product.selectedSize}}">
         </acre-editable-product-size-selector>
+        <acre-editable-product-color-selector class="product-data"
+          editable="[[editable]]"
+          colors="{{_product.colors}}"
+          selected-color="{{_product.selectedColor}}"></acre-editable-product-color-selector>
         <span>Descrição</span>
         <acre-editable-input class="product-data product-description"
             editable="[[editable]]"
@@ -143,11 +157,15 @@ Element to show a product page and edit a product
 
     <template is="dom-if" if={{showEditablePopover}}>
       <paper-card class="editable-menu">
-        <div class="editable-header">
-          Editando [[product.name]]
+        <div class="editable-header layout horizontal center">
+          Editando produto:
+          <span class="layout horizontal center" hidden$="[[!_product.selectedColor]]">&nbsp Cor [[_product.selectedColor.name]] <span class="color-item" style$="height:10px; margin: 0 10px;background-color: {{_product.selectedColor.hex}}"></span></span>
+          <span hidden$="[[!_product.selectedSize]]">&nbsp Tamanho <span style="text-decoration: underline">[[_product.selectedSize]]</span></span>
+          <paper-button class="link-button">Editar Todos</paper-checkbox>
         </div>
         <div class="card-content">
           <paper-checkbox checked="{{editable}}">Editável</paper-checkbox>
+          <paper-button class="link-button">Editar Estoques</paper-checkbox>
         </div>
         <div class="card-actions">
           <paper-button on-tap="_save">Salvar</paper-button>
@@ -226,14 +244,26 @@ Element to show a product page and edit a product
           * Generate a unique product from the variations passed by parameter
           */
           generateProductFromVariations: function(){
+
+            var _this = this;
+
             if(this.productVariations && this.productVariations.length){
 
+              // set base product
               var product = Object.assign({}, this.productVariations[0]);
 
+              // initialize color and size
               product.sizes = [];
-              var _this = this;
+              product.colors = [];
+
+              // set sizes and colors
               this.productVariations.forEach(function(e) {
-                product.sizes.push(e.size);
+
+                if(e.size)
+                  product.sizes.push(e.size);
+                if(e.color)
+                  product.colors.push(e.color);
+
               });
 
               this.set('_product', product);
@@ -255,32 +285,67 @@ Element to show a product page and edit a product
               this.productVariations = [];
             }
 
+            // assert: remove color and size of product
+            // helps make the object.assign work
+            delete this._product.size;
+            delete this._product.color;
+
             var _this = this;
-            this._product.sizes.forEach(function(size){
+            var sizesArray = _this._product.sizes.reduce(function (prev, next) {
+              var data = Object.assign({}, _this._product, { "size": next });
+              prev.push(data);
+              return prev;
+            }, []);
 
-              //check if there is a variation with this item size
-              var existingVariation = _this.productVariations.filter(function(e){
-                return e.size == size;
-              });
-              if(existingVariation.length) return;
+            var colorsArray = this._product.colors.reduce(function (prev, next) {
+              var data = Object.assign({}, _this._product, { "color": next });
+              prev.push(data);
+              return prev;
+            }, []);
 
-              // copy the main product
-              var productCopy = Object.assign({}, _this._product);
+            // pass this to a funcition and map the array with biggest length first (?)
+            if(!sizesArray.length){
+              sizesArray.push({});
+            }
+            if(!colorsArray.length){
+              colorsArray.push({});
+            }
 
-              // remove unecessary properties
-              delete productCopy._id;
-              delete productCopy.sizes;
-              delete productCopy.selectedSize;
-              productCopy.size = size;
+            var variations = sizesArray.reduce(function (prev, sizeItem) {
 
-              _this.productVariations.push(productCopy);
-            });
+              var results = colorsArray.reduce(function (prev, colorItem) {
+                var newVariation = Object.assign({}, sizeItem, colorItem);
 
-            console.log("generated variations");
-            console.log(this.productVariations);
-            return this.productVariations;
+                delete newVariation.sizes;
+                delete newVariation.selectedSize;
+                delete newVariation.colors;
+                delete newVariation.selectedColor;
+
+                // check if there is a variation with the same characteristics
+                var hasVariation = _this.productVariations.filter(function(e){
+                    var hasSize = !newVariation.size || false;
+                    var hasColor = !newVariation.color || false;
+
+                    if(newVariation.color){
+                      hasColor = hasSize && e.color == newVariation.color;
+                    }
+                    if(newVariation.size){
+                      hasSize = e.size == newVariation.size;
+                    }
+                    return hasSize && hasColor;
+                });
+                if(hasVariation.length) return prev;
+
+                prev.push(newVariation);
+                return prev;
+              }, []);
+
+              return prev.concat(results)
+            },[]);
+
+
+            this.productVariations = this.productVariations.concat(variations);
           },
-
     });
   </script>
 </dom-module>

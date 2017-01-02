@@ -12,6 +12,11 @@
             display: none!important;
           }
 
+          .link-button{
+            text-transform: none;
+            text-decoration: underline;
+          }
+
           .dialog-container {
             padding: 15px 15px 5px 15px!important;
           }
@@ -36,12 +41,55 @@
             min-height: 40px;
           }
 
-
           .data-label {
             font-size: var(--acre-font-medium);
             line-height: 24px;
             font-weight: 500;
             margin-bottom: 10px;
+          }
+
+          /*Color item, see acre-editable-product-color-selector*/
+          .color-item[selected]{
+            border: 2px solid black;
+          }
+
+          .color-container{
+            margin: 0 5px 5px 0;
+          }
+
+          .color-item {
+            height: 30px;
+            width: 30px;
+            border: 1px solid #cecece;
+            color: #6f6f6f;
+            cursor: pointer;
+            border-radius: 20px;
+          }
+
+          /*Size selctable, see acre-editable-product-size-selector*/
+          .size-selectable-item{
+            height: 50px;
+            width: 50px;
+            min-width: 50px;
+            min-width: 55px;
+            border: 1px solid #ececec;
+            color: #6f6f6f;
+            cursor: pointer;
+          }
+
+          .size-selectable-item[selected], .size-item[selected]{
+            color: white;
+            background-color: var(--accent-color, black);
+          }
+
+          .size-item {
+            height: 40px;
+            width: 40px;
+            border: 1px solid #cecece;
+            color: #6f6f6f;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
           }
 
         </style>
