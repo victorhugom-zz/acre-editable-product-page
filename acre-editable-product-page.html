@@ -2,10 +2,11 @@
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../iron-ajax/iron-ajax.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="acre-editable-shared-styles.html">
 <link rel="import" href="acre-editable-input.html">
@@ -162,14 +163,29 @@ Element to show a product page and edit a product
     <!--Editing popover-->
     <template is="dom-if" if={{showEditablePopover}}>
       <paper-card class="editable-menu">
-        <div class="editable-header layout horizontal center">
-          Editando produto:
-          <span class="layout horizontal center" hidden$="[[!_product.selectedColor]]">&nbsp Cor [[_product.selectedColor.name]] <span class="color-item" style$="height:10px; margin: 0 10px;background-color: {{_product.selectedColor.hex}}"></span></span>
-          <span hidden$="[[!_product.selectedSize]]">&nbsp Tamanho <span style="text-decoration: underline">[[_product.selectedSize]]</span></span>
-          <paper-button class="link-button">Editar Todos</paper-checkbox>
+        <div class="editable-header layout vertical" hidden$="{{!_editingAllProducts}}">
+          <div class="layout horizontal center">Editando todos os produtos</div></br>
+          <div class="layout horizontal center">
+            <iron-icon icon="icons:warning" style="margin-right: 15px;"></iron-icon>Qualquer alteração feita vai afetar todos os produtos </br>
+            para editar um produto específico selecione uma cor e/ou tamanho.
+          </div>
+        </div>
+        <div class="editable-header layout vertical" hidden$="{{_editingAllProducts}}">
+          Editando os produtos:
+          <div style="margin-top: 15px;">
+              <span hidden$="[[!_product.selectedColor]]">Com a Cor</span>
+              <span style="text-decoration: underline" hidden$="[[!_product.selectedColor.name]]">&nbsp[[_product.selectedColor.name]]&nbsp</span>
+              <span class="color-item" hidden$="[[!_product.selectedColor]]" style$="height:10px; margin: 0 5px;display: inline-block;background-color: {{_product.selectedColor.hex}}"></span>
+              <span hidden$="[[_product.selectedSize]]">e todos os tamanhos</span>
+              <span hidden$="[[!_product.selectedSize]]">Tamanho <span style="text-decoration: underline">[[_product.selectedSize]]</span></span>
+          </div>
+          <div class="layout horizontal center" style="font-size: 12px">
+            * Somente produtos com as caracteristicas acima serão alterados
+            <paper-button class="link-button" on-tap="_clearSelectedData">Editar Todos</paper-checkbox>
+          </div>
         </div>
         <div class="card-content">
-          <paper-checkbox checked="{{editable}}">Editável</paper-checkbox>
+          <paper-checkbox checked="{{editable}}">Editar Produto</paper-checkbox>
           <paper-button class="link-button" on-tap="_editStock">Editar dados adicionais</paper-checkbox>
         </div>
         <div class="card-actions">
@@ -181,7 +197,6 @@ Element to show a product page and edit a product
     <!--Stock dialog-->
     <paper-dialog id="stockDialog"
       style="min-width: 60vw!important;"
-      with-backdrop
       entry-animation="scale-up-animation"
       exit-animation="fade-out-animation">
       <paper-dialog-scrollable>
@@ -234,10 +249,29 @@ Element to show a product page and edit a product
               value: function () {
               }
             },
+            _editingAllProducts: {
+              type: Boolean,
+              value: true
+            },
           },
+
+          observers: [
+            '_selectedDataObserver(_product.*)'
+          ],
 
           ready: function(){
             this.generateProductFromVariations();
+          },
+
+          /**
+          * Occours when the selected color or size changes
+          */
+          _selectedDataObserver: function(product){
+
+            if(!this._product.selectedColor && !this._product.selectedSize)
+              this.set('_editingAllProducts', true);
+              else
+              this.set('_editingAllProducts', false);
           },
 
           /**
@@ -250,8 +284,16 @@ Element to show a product page and edit a product
               this._product = {};
           },
 
+          /**
+          * Shows the modal to edit the stock
+          */
           _editStock: function(){
             this.$.stockDialog.open();
+          },
+
+          _clearSelectedData: function(){
+            this.set('_product.selectedColor', null)
+            this.set('_product.selectedSize', null);
           },
 
           /**
