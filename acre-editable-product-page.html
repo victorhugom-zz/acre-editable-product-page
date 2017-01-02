@@ -4,11 +4,15 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+
 <link rel="import" href="acre-editable-shared-styles.html">
 <link rel="import" href="acre-editable-input.html">
 <link rel="import" href="acre-editable-image-input-list.html">
 <link rel="import" href="acre-editable-product-size-selector.html">
 <link rel="import" href="acre-editable-product-color-selector.html">
+<link rel="import" href="acre-editable-product-stock-table.html">
 
 <!--
 `acre-editable-product-page`
@@ -155,6 +159,7 @@ Element to show a product page and edit a product
       </div>
     </div>
 
+    <!--Editing popover-->
     <template is="dom-if" if={{showEditablePopover}}>
       <paper-card class="editable-menu">
         <div class="editable-header layout horizontal center">
@@ -165,13 +170,28 @@ Element to show a product page and edit a product
         </div>
         <div class="card-content">
           <paper-checkbox checked="{{editable}}">Editável</paper-checkbox>
-          <paper-button class="link-button">Editar Estoques</paper-checkbox>
+          <paper-button class="link-button" on-tap="_editStock">Editar dados adicionais</paper-checkbox>
         </div>
         <div class="card-actions">
           <paper-button on-tap="_save">Salvar</paper-button>
         </div>
       </paper-card>
     </template>
+
+    <!--Stock dialog-->
+    <paper-dialog id="stockDialog"
+      style="min-width: 60vw!important;"
+      with-backdrop
+      entry-animation="scale-up-animation"
+      exit-animation="fade-out-animation">
+      <paper-dialog-scrollable>
+        <acre-editable-product-stock-table style="border-bottom: 1px solid #e0e0e0; max-height: 400px;"
+        product-variations="{{productVariations}}"></acre-editable-product-stock-table>
+      </paper-dialog-scrollable>
+      <paper-button class="dialog-close-button" dialog-dismiss>Fechar</paper-button>
+      </div>
+    </paper-dialog>
+
   </template>
 
   <script>
@@ -230,6 +250,10 @@ Element to show a product page and edit a product
               this._product = {};
           },
 
+          _editStock: function(){
+            this.$.stockDialog.open();
+          },
+
           /**
           * The `acre-editable-product-page-save-click` event is fired whenever the save button is clicked
           *
@@ -257,12 +281,18 @@ Element to show a product page and edit a product
               product.colors = [];
 
               // set sizes and colors
-              this.productVariations.forEach(function(e) {
+              this.productVariations.forEach(function(variation) {
 
-                if(e.size)
-                  product.sizes.push(e.size);
-                if(e.color)
-                  product.colors.push(e.color);
+                if(variation.size && !product.sizes.filter(function(e){ return e == variation.size}).length)
+                  product.sizes.push(variation.size);
+                if(variation.color){
+
+                  var hasColor = variation.color.name ? product.colors.filter(function(e){ return e.name == variation.color.name}).length :
+                                         product.colors.filter(function(e){ return e.hex == variation.color.hex}).length;
+
+                  if(!hasColor)
+                    product.colors.push(variation.color);
+                }
 
               });
 
@@ -323,11 +353,15 @@ Element to show a product page and edit a product
 
                 // check if there is a variation with the same characteristics
                 var hasVariation = _this.productVariations.filter(function(e){
-                    var hasSize = !newVariation.size || false;
-                    var hasColor = !newVariation.color || false;
+                    var hasSize = false;
+                    var hasColor = false;
 
                     if(newVariation.color){
-                      hasColor = hasSize && e.color == newVariation.color;
+                      if(e.color.name)
+                        hasColor = e.color.name == newVariation.color.name;
+                      else if(e.color.hex)
+                        hasColor = e.color.hex == newVariation.color.hex;
+
                     }
                     if(newVariation.size){
                       hasSize = e.size == newVariation.size;

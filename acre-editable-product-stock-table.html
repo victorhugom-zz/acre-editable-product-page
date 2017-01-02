@@ -1,0 +1,53 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-datatable/paper-datatable.html">
+<link rel="import" href="../paper-datatable/paper-datatable-edit-dialog.html">
+<link rel="import" href="../paper-datatable/paper-datatable-column.html">
+<link rel="import" href="../paper-input/paper-input.html">
+
+<!--
+`acre-editable-product-stock-table`
+
+
+@demo demo/demo-acre-editable-product-stock-table.html
+-->
+
+<dom-module id="acre-editable-product-stock-table">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <paper-datatable data="{{productVariations}}">
+        <paper-datatable-column header="SKU" property="sku" editable></paper-datatable-column>
+        <paper-datatable-column header="Nome" property="name"></paper-datatable-column>
+        <paper-datatable-column header="Cor" property="color">
+          <template>
+            <span class="color-item" style$="height: 30px;width: 100%;margin: 0;display: block;background-color: {{value.hex}}"></span>
+          </template>
+        </paper-datatable-column>
+        <paper-datatable-column header="Tamanho" property="size" sorted></paper-datatable-column>
+        <paper-datatable-column header="Estoque" property="stock" type="Number" editable></paper-datatable-column>
+        <paper-datatable-column header="Preço" property="price"></paper-datatable-column>
+    </paper-datatable>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'acre-editable-product-stock-table',
+
+      properties:{
+        /**
+        * All product variations, you must use this property to set
+        * the product data
+        */
+        productVariations: {
+          type: Array,
+          value: function () {
+          },
+        },
+      }
+    });
+  </script>
+</dom-module>
