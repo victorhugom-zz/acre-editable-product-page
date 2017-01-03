@@ -115,15 +115,15 @@
         '_imageSelectedObserver(_imageSelected.*)',
       ],
 
-
-
       /**
       * Occours when the image list changes,
       * if there is just on image, set this one as selected
       */
       _imagesObservable: function(newValue, oldValue){
-         if(this.images && this.images.length > 0 && !oldValue)
+         if(this.images && this.images.length > 0 && !oldValue){
           this.set('_imageSelected', this.images[0]);
+          this._imageSelectedIndex = 0;
+         }
       },
 
       /**
@@ -134,11 +134,10 @@
 
         if(!this.images) return;
 
-        var index = this.images.indexOf(this._imageSelected);
-        if(index != -1){
-
+        if(!this._imageSelectedIndex){
           var path = e.path.replace('_imageSelected', '');
-          this.set('images.' + index + path, e.value);
+          console.log('images.' + this._imageSelectedIndex + path);
+          this.set('images.' + this._imageSelectedIndex + path, e.value);
         }
       },
 
@@ -166,6 +165,7 @@
           url: '',
         });
         this.set('_imageSelected', this.images[this.images.length -1]);
+        this._imageSelectedIndex = this.images.length -1;
       },
 
       /**
@@ -173,6 +173,7 @@
       */
       _selectImage: function(e){
          this.set('_imageSelected', this.images[e.model.index]);
+         this._imageSelectedIndex  = e.model.index;
       },
 
       /**
