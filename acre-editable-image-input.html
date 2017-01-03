@@ -46,7 +46,7 @@
         --paper-slider-active-color: var(--paper-red-500);
       }
 
-      paper-slider.positiony {
+      paper-slider.positionX {
         --paper-slider-knob-color: var(--paper-green-500);
         --paper-slider-active-color: var(--paper-green-500);
       }
@@ -172,7 +172,6 @@
       },
 
       observers: [
-        // '_imageUrlChanged(image.url)',
         '_imagePositionChanged(image.scale, image.positionX, image.positionY)',
       ],
 

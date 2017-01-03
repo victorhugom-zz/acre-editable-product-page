@@ -52,10 +52,13 @@
             <iron-icon class="icon" icon="remove" on-tap="_removeColor"></iron-icon>
           </template>
 
-          <div class="color-item layout vertical center"
+          <div class="color-item layout horizontal center-justified "
             style="background-color: [[color.hex]]"
-            on-tap="_selectColor"
-            selected$="{{_isSelected(color, selectedColor)}}">
+            on-tap="_selectColor">
+            <iron-icon icon="check"
+            class="layout self-center"
+            hidden$="{{_isNotSelected(color, selectedColor)}}"
+            style="color: white;"></iron-icon>
           </div>
 
           <template is="dom-if" if={{editable}}>
@@ -64,7 +67,7 @@
           <acre-editable-input class="color-name"
             value="{{color.name}}"
             label="name"
-            hidden="[[!showColorLabels]]"
+            hidden$="[[!showColorLabels]]"
             editable="[[editable]]"></acre-editable-input>
 
         </div>
@@ -108,11 +111,17 @@
             type: String,
             value: '',
             notify: true
-          }
+          },
+          /**
+          * Set if the color are named or not
+          */
+          showColorLabels: {
+            type: Boolean,
+            value: false
+          },
         },
 
         ready: function () {
-
         },
 
         /**
@@ -126,8 +135,8 @@
           this.fire('acre-product-color-selected', { color: this.color });
         },
 
-        _isSelected: function (color, selectedColor) {
-          return color == selectedColor;
+        _isNotSelected: function (color, selectedColor) {
+          return color != selectedColor;
         },
 
         _addColor: function(e) {
