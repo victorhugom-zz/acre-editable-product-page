@@ -104,11 +104,26 @@ Element to show a product page and edit a product
 
       .editable-menu {
         width: 100%;
+        background: white;
         max-width: 500px;
         position: fixed;
         bottom: 0;
         right: 0;
         z-index: 2;
+        transition: all .5s ease-in-out;
+      }
+
+      .editable-menu-toggle{
+        cursor: pointer;
+      }
+
+      .editable-menu-toggle:hover{
+        background-color: #f3f3f3;
+      }
+
+      .editable-menu[collapsed]{
+        right: -466px;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
       }
 
       .editable-header {
@@ -204,20 +219,25 @@ Element to show a product page and edit a product
       </div>
     </div>
 
-    <!--Editing popover-->
-    <template is="dom-if" if={{showEditablePopover}}>
-      <paper-card class="editable-menu">
-        <div class="editable-header layout vertical">
-          Editando - {{_product.name}}
+    <!--Editable Menu-->
+    <template is="dom-if" if={{showEditableMenu}}>
+      <div class="layout horizontal editable-menu" collapsed$="[[_editableMenuCollapsed]]">
+        <div class="layout vertical center-justified editable-menu-toggle" on-tap="_toggleEditableMenu">
+          <iron-icon icon="icons:chevron-left" style="width: 35px; height: 35px;"></iron-icon>
         </div>
-        <div class="card-content">
-          <paper-checkbox checked="{{editable}}">Editar Produto</paper-checkbox>
-          <paper-button class="link-button" on-tap="_editStock">Editar dados adicionais</paper-checkbox>
-        </div>
-        <div class="card-actions">
-          <paper-button on-tap="_save">Salvar</paper-button>
-        </div>
-      </paper-card>
+        <paper-card style="width: 100%">
+          <div class="editable-header layout vertical">
+            Editando - {{_product.name}}
+          </div>
+          <div class="card-content">
+            <paper-checkbox checked="{{editable}}">Editar Produto</paper-checkbox>
+            <paper-button class="link-button" on-tap="_editStock">Editar dados adicionais</paper-checkbox>
+          </div>
+          <div class="card-actions">
+            <paper-button on-tap="_save">Salvar</paper-button>
+          </div>
+        </paper-card>
+      </div>
     </template>
 
     <!--Other Characteristics Dialog-->
@@ -251,10 +271,10 @@ Element to show a product page and edit a product
             },
 
             /**
-            * Set if the editable popover is visible or not
+            * Set if the editable menu is visible or not
             * @type Boolean
             */
-            showEditablePopover: {
+            showEditableMenu: {
               type: Boolean,
               value: false
             },
@@ -286,6 +306,14 @@ Element to show a product page and edit a product
               type: Boolean,
               value: true
             },
+
+            /**
+             * Set if the editable menu is collapsed or not
+             */
+            _editableMenuCollapsed: {
+              type: Boolean,
+              value: false
+            }
           },
 
           observers: [
@@ -522,6 +550,11 @@ Element to show a product page and edit a product
 
             this.productVariations = this.productVariations.concat(variations);
             return this.productVariations;
+          },
+
+          _toggleEditableMenu: function(){
+            console.log(this._editableMenuCollapsed);
+            this.set('_editableMenuCollapsed', !this._editableMenuCollapsed);
           },
     });
   </script>
