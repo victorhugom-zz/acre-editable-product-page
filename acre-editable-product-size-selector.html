@@ -124,6 +124,9 @@
         },
 
         _sizesObservable: function (newValue, oldValue) {
+
+          if(!this.sizes) return;
+
           var _this = this;
           this.sizes.forEach(function (size) {
             var selectedSize = _this._availableSizes.forEach(function (sizeSelectable, index) {

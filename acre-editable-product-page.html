@@ -15,8 +15,8 @@
 <link rel="import" href="acre-editable-product-color-selector.html">
 <link rel="import" href="acre-editable-product-stock-table.html">
 
-
 <script src="utils.js"></script>
+
 <!--
 `acre-editable-product-page`
 
@@ -48,6 +48,10 @@ Element to show a product page and edit a product
       .product-data-container {
         margin: 0 0 0 20px;
         max-width: 300px;
+      }
+
+      .product-page-container[editing]{
+        margin-top: 100px;
       }
 
       .product-data {
@@ -109,20 +113,58 @@ Element to show a product page and edit a product
 
       .editable-header {
         padding: 20px;
-        background-color: black;
-        color: white;
+        color: black;
         border-bottom: 1px solid #c5c5c5;
       }
 
-      .selected-color{
-        height: 10px;
-        width: 30px;
-        border: 1px solid #cecece;
-        border-radius: 20px;
+      .editable-alert {
+        padding: 15px 20px;
+        width: 100%;
+        margin-bottom: 30px;
+        line-height: 20px;
+        background-color: black;
+        color:white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 70px;
+      }
+
+      .editable-alert .color-item{
+        height:10px;
+        margin: 0 5px;
+        display: inline-block;
       }
     </style>
 
-    <div class="product-page-container">
+    <!--Editing Alert-->
+     <template is="dom-if" if={{editable}}>
+      <paper-card class="editable-alert" hidden$="[[!editable]]">
+        <div class="layout vertical" hidden$="{{!_editingAllProducts}}">
+          <div class="layout horizontal center">Editando todos os produtos</div>
+          <div class="layout horizontal center" style="font-size: 12px;">
+            * Qualquer alteração feita vai afetar todos os produtos, para editar um produto específico selecione uma cor e/ou tamanho.
+          </div>
+        </div>
+        <div class="layout vertical" hidden$="{{_editingAllProducts}}">
+          <div>
+            Editando os Produtos:
+            <span hidden$="[[!_product.selectedColor]]">Com a Cor</span>
+            <span hidden$="[[!_product.selectedColor.name]]" style="text-decoration: underline" >&nbsp[[_product.selectedColor.name]]&nbsp</span>
+            <span hidden$="[[!_product.selectedColor.hex]]" class="color-item" style$="background-color: {{_product.selectedColor.hex}}"></span>
+            <span hidden$="[[_product.selectedSize]]">e todos os tamanhos</span>
+            <span hidden$="[[!_product.selectedSize]]">Tamanho <span style="text-decoration: underline">[[_product.selectedSize]]</span></span>
+          </div>
+          <div class="layout horizontal center" style="font-size: 12px">
+            * Somente produtos com as caracteristicas acima serão alterados
+            <paper-button class="link-button" style="height: 10px;" on-tap="_clearSelectedData">Editar Todos</paper-button>
+          </div>
+        </div>
+      </paper-card>
+    </template>
+
+    <!--Product Data-->
+    <div class="product-page-container" editing$="[[editable]]">
       <acre-editable-image-input-list class="flex"
           images="{{_product.images}}"
           editable="[[editable]]"></acre-editable-image-input-list>
@@ -132,14 +174,14 @@ Element to show a product page and edit a product
             value="{{_product.name}}"
             label="Nome do Produto"></acre-editable-input>
         <div class="layout horizontal center product-sku">
-          <span>SKU: </span>
+          <span>SKU: &nbsp;</span>
           <acre-editable-input
               editable="[[editable]]"
               value="{{_product.sku}}"
               label="SKU"></acre-editable-input>
         </div>
         <div class="layout horizontal product-data product-price">
-          <span>R$&nbsp;</span>
+          <span>R$ &nbsp;</span>
           <acre-editable-input editable="[[editable]]"
               value="{{_product.price}}"
               label="Preço"></acre-editable-input>
@@ -165,26 +207,8 @@ Element to show a product page and edit a product
     <!--Editing popover-->
     <template is="dom-if" if={{showEditablePopover}}>
       <paper-card class="editable-menu">
-        <div class="editable-header layout vertical" hidden$="{{!_editingAllProducts}}">
-          <div class="layout horizontal center">Editando todos os produtos</div></br>
-          <div class="layout horizontal center" style="font-size: 12px;">
-            <iron-icon icon="icons:warning" style="margin-right: 15px;"></iron-icon>Qualquer alteração feita vai afetar todos os produtos,
-            para editar um produto específico selecione uma cor e/ou tamanho.
-          </div>
-        </div>
-        <div class="editable-header layout vertical" hidden$="{{_editingAllProducts}}">
-          Editando os produtos:
-          <div style="margin-top: 15px;">
-              <span hidden$="[[!_product.selectedColor]]">Com a Cor</span>
-              <span style="text-decoration: underline" hidden$="[[!_product.selectedColor.name]]">&nbsp[[_product.selectedColor.name]]&nbsp</span>
-              <span class="color-item" hidden$="[[!_product.selectedColor]]" style$="height:10px; margin: 0 5px;display: inline-block;background-color: {{_product.selectedColor.hex}}"></span>
-              <span hidden$="[[_product.selectedSize]]">e todos os tamanhos</span>
-              <span hidden$="[[!_product.selectedSize]]">Tamanho <span style="text-decoration: underline">[[_product.selectedSize]]</span></span>
-          </div>
-          <div class="layout horizontal center" style="font-size: 12px">
-            * Somente produtos com as caracteristicas acima serão alterados
-            <paper-button class="link-button" on-tap="_clearSelectedData">Editar Todos</paper-checkbox>
-          </div>
+        <div class="editable-header layout vertical">
+          Editando - {{_product.name}}
         </div>
         <div class="card-content">
           <paper-checkbox checked="{{editable}}">Editar Produto</paper-checkbox>
@@ -196,7 +220,7 @@ Element to show a product page and edit a product
       </paper-card>
     </template>
 
-    <!--Stock dialog-->
+    <!--Other Characteristics Dialog-->
     <paper-dialog id="stockDialog"
       style="min-width: 60vw!important;"
       entry-animation="scale-up-animation"
@@ -246,11 +270,18 @@ Element to show a product page and edit a product
               observer: '_productVariationsObservable'
             },
 
+            /**
+             * The product base, a copy of the product being edited
+             */
             _product: {
               type: Object,
               value: function () {
               }
             },
+
+            /**
+             * If all products are being edited or not
+             */
             _editingAllProducts: {
               type: Boolean,
               value: true
@@ -268,46 +299,69 @@ Element to show a product page and edit a product
           },
 
           /**
-          * Occours when the selected color or size changes
+          * Occours when any property in the baseProduct (_product) changes
+          * Changes all the products that match the selected criteria
           */
           _productObserver: function (e) {
 
+            if (!this._product) return;
+
             var indexes = [];
-            var path = e.path.replace('_product','').replace('#','');
+            var path = e.path.replace('_product', '').replace('#', '');
             var _this = this;
 
-            // update all products
-            if (!this._product.selectedColor && !this._product.selectedSize){
+            // changes the base product to reflect one product with the selected characteristics
+            if (path == '.selectedSize' || path == '.selectedColor') {
 
-              indexes = this.productVariations.reduce((prev, next, idx) => {
-                prev.push(idx);
-                return prev;
-              }, []);
-              this.set('_editingAllProducts', true);
-            }
-            //update selectedProducts
-            else {
+              var matches = this.productVariations.filter(function (e, index) {
 
-              indexes = this.productVariations.reduce((prev, next, idx) => {
-                var hasSize = _this._product.selectedSize ? next.size === _this._product.selectedSize : true;
-                var hasColor = _this._product.selectedColor ? next.color.hex === _this._product.selectedColor.hex : true;
+                var hasSize = _this._product.selectedSize ? e.size == _this._product.selectedSize : true;
+                var hasColor = _this._product.selectedColor ? e.color.hex == _this._product.selectedColor.hex : true;
 
-                if(hasSize && hasColor)
-                  prev.push(idx);
-                return prev;
-              }, []);
-
-              this.set('_editingAllProducts', false);
-            }
-
-            if(path){
-              // console.log(`path: ${path}`)
-              indexes.forEach(x =>{
-                // console.log(`items: ${'productVariations.' + x + path}`)
-
-                var value = isObj(e.value) ? Object.deepAssign({},e.value) : e.value;
-                this.set('productVariations.' + x + path, value);
+                if (hasSize && hasColor) return index;
               });
+
+              if (matches.length)
+                this.generateProductFromVariations(this.productVariations.indexOf(matches[0]));
+              else
+                this.generateProductFromVariations();
+
+            } else {
+
+
+              // Update all products
+              if (!this._product.selectedColor && !this._product.selectedSize) {
+
+                indexes = this.productVariations.reduce((prev, next, idx) => {
+                  prev.push(idx);
+                  return prev;
+                }, []);
+                this.set('_editingAllProducts', true);
+              }
+
+              // Update selectedProducts
+              else {
+
+                indexes = this.productVariations.reduce((prev, next, idx) => {
+                  var hasSize = _this._product.selectedSize ? next.size == _this._product.selectedSize : true;
+                  var hasColor = _this._product.selectedColor ? next.color.hex == _this._product.selectedColor.hex : true;
+
+                  if (hasSize && hasColor)
+                    prev.push(idx);
+                  return prev;
+                }, []);
+
+                this.set('_editingAllProducts', false);
+              }
+
+              if (path) {
+                // console.log(`path: ${path}`);
+                indexes.forEach(x => {
+                  // console.log(`items: ${'productVariations.' + x + path}`);
+                  var value = isObj(e.value) ? Object.deepAssign({}, e.value) : e.value;
+                  this.set('productVariations.' + x + path, value);
+                });
+              }
             }
           },
 
@@ -328,6 +382,9 @@ Element to show a product page and edit a product
             this.$.stockDialog.open();
           },
 
+          /**
+           * Set the selected properties to null
+           */
           _clearSelectedData: function(){
             this.set('_product.selectedColor', null)
             this.set('_product.selectedSize', null);
@@ -375,6 +432,13 @@ Element to show a product page and edit a product
                 }
 
               });
+
+              if(this._product){
+                product.selectedColor = this._product.selectedColor;
+                product.selectedSize = this._product.selectedSize;
+              }
+
+              this._product = null;
               this.set('_product', product);
             }else{
               this._product = {};
