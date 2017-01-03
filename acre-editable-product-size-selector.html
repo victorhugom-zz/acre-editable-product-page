@@ -3,9 +3,11 @@
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../neon-animation/animations/fade-out-animation.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+
 <link rel="import" href="acre-editable-shared-styles.html">
 
 <!--
@@ -38,10 +40,12 @@
         as=size index-as=index>
         <div class="size-item layout vertical center"
           on-tap="_selectSize"
+          style="position: relative"
           selected$="{{_isSelected(size, selectedSize)}}">
           <span style="margin-top: 10px">
             [[size]]
           </span>
+          <paper-ripple ></paper-ripple>
         </div>
       </template>
 
@@ -65,11 +69,13 @@
           <template is="dom-repeat" items={{_availableSizes}}
             as=size index-as=index>
             <div class="size-selectable-item layout vertical center flex"
+              style="position: relative"
               selected$="[[size.selected]]"
               on-tap="_addSizeToList">
               <span style="margin-top: 15px">
                 [[size.value]]
               </span>
+              <paper-ripple ></paper-ripple>
             </div>
           </template>
         </div>

@@ -1,12 +1,14 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="../paper-swatch-picker/paper-swatch-picker.html">
 <link rel="import" href="../neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../paper-swatch-picker/paper-swatch-picker.html">
+
 <link rel="import" href="acre-editable-input.html">
 <link rel="import" href="acre-editable-shared-styles.html">
 
@@ -53,12 +55,13 @@
           </template>
 
           <div class="color-item layout horizontal center-justified "
-            style="background-color: [[color.hex]]"
+            style="background-color: [[color.hex]]; position: relative"
             on-tap="_selectColor">
             <iron-icon icon="check"
-            class="layout self-center"
-            hidden$="{{_isNotSelected(color, selectedColor)}}"
-            style="color: white;"></iron-icon>
+              class="layout self-center"
+              hidden$="{{!_isSelected(color, selectedColor)}}"
+              style="color: white;"></iron-icon>
+              <paper-ripple></paper-ripple>
           </div>
 
           <template is="dom-if" if={{editable}}>
@@ -135,8 +138,8 @@
           this.fire('acre-product-color-selected', { color: this.color });
         },
 
-        _isNotSelected: function (color, selectedColor) {
-          return color != selectedColor;
+        _isSelected: function (color, selectedColor) {
+          return selectedColor && color == selectedColor;
         },
 
         _addColor: function(e) {

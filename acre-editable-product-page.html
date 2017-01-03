@@ -42,7 +42,7 @@ Element to show a product page and edit a product
       acre-editable-image-input-list {
         margin: 0 20px 0 0;
         max-width: 500px;
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--acre-box-shadow);
         padding: 10px;
       }
 
@@ -77,6 +77,7 @@ Element to show a product page and edit a product
 
       .product-description {
         color: #757575;
+        text-align: justify;
         font-size: var(--acre-font-small)
       }
 
@@ -124,7 +125,7 @@ Element to show a product page and edit a product
 
       .editable-menu[collapsed]{
         right: -466px;
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--acre-box-shadow);
       }
 
       .editable-header {
@@ -419,7 +420,7 @@ Element to show a product page and edit a product
            * Set the selected properties to null
            */
           _clearSelectedData: function(){
-            this.set('_product.selectedColor', null)
+            this.set('_product.selectedColor', null);
             this.set('_product.selectedSize', null);
           },
 
@@ -469,6 +470,9 @@ Element to show a product page and edit a product
               if(this._product){
                 product.selectedColor = this._product.selectedColor;
                 product.selectedSize = this._product.selectedSize;
+              }else{
+                product.selectedColor = null;
+                product.selectedSize = null;
               }
 
               this._product = null;
@@ -558,7 +562,6 @@ Element to show a product page and edit a product
           },
 
           _toggleEditableMenu: function(){
-            console.log(this._editableMenuCollapsed);
             this.set('_editableMenuCollapsed', !this._editableMenuCollapsed);
           },
     });
