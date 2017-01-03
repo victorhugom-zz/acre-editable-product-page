@@ -274,6 +274,8 @@ Element to show a product page and edit a product
             var path = e.path.replace('_product','').replace('#','');
             var _this = this;
 
+            if(path) console.log(`path: ${path}`)
+
             // update all products
             if (!this._product.selectedColor && !this._product.selectedSize){
 

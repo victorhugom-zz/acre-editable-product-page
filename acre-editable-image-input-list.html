@@ -99,7 +99,10 @@
         images: {
           type: Array,
           notify: true,
-          observer: "_imagesObservable"
+          observer: "_imagesObservable",
+          value: function(){
+            return [];
+          }
         },
 
         _imageSelected: {
@@ -108,6 +111,12 @@
         },
       },
 
+      observers: [
+        '_imageSelectedObserver(_imageSelected.*)',
+      ],
+
+
+
       /**
       * Occours when the image list changes,
       * if there is just on image, set this one as selected
@@ -115,6 +124,22 @@
       _imagesObservable: function(newValue, oldValue){
          if(this.images && this.images.length > 0 && !oldValue)
           this.set('_imageSelected', this.images[0]);
+      },
+
+      /**
+      * Occours when the selected image changes,
+      * set the changes to the image insize the arrray
+      */
+      _imageSelectedObserver: function(e){
+
+        if(!this.images) return;
+
+        var index = this.images.indexOf(this._imageSelected);
+        if(index != -1){
+
+          var path = e.path.replace('_imageSelected', '');
+          this.set('images.' + index + path, e.value);
+        }
       },
 
       /**
