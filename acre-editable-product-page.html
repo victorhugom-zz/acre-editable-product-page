@@ -4,6 +4,7 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
@@ -137,8 +138,9 @@ Element to show a product page and edit a product
         width: 100%;
         margin-bottom: 30px;
         line-height: 20px;
-        background-color: black;
-        color:white;
+        background-color: #FFCC00;
+        font-weight: 500;
+        color: black;
         position: fixed;
         top: 0;
         left: 0;
@@ -215,7 +217,10 @@ Element to show a product page and edit a product
             editable="[[editable]]"
             value="{{_product.description}}"
             label="Descrição"></acre-editable-input>
-        <div class="buy-button layout product-data">COMPRAR</div>
+        <div class="buy-button layout product-data" style="position: relative">
+          <paper-ripple ></paper-ripple>
+          COMPRAR
+        </div>
       </div>
     </div>
 
