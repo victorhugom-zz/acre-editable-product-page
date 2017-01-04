@@ -151,7 +151,7 @@
          */
         _selectSize: function (e) {
           this.set("selectedSize", e.model.size);
-          this.fire('acre-product-size-selected', { size: this.size });
+          this.fire('acre-product-size-selected', { size: e.model.size });
         },
 
         _isSelected: function (size, selectedSize) {

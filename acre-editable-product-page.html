@@ -2,6 +2,7 @@
 <link rel="import" href="../paper-card/paper-card.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
@@ -104,6 +105,11 @@ Element to show a product page and edit a product
         }
       }
 
+       .yellow-button {
+          text-transform: none;
+          color: #eeff41;
+        }
+
       .editable-menu {
         width: 100%;
         background: white;
@@ -135,7 +141,7 @@ Element to show a product page and edit a product
       }
 
       .editable-alert {
-        padding: 15px 20px;
+        padding: 7px 20px;
         width: 100%;
         margin-bottom: 30px;
         line-height: 20px;
@@ -145,7 +151,7 @@ Element to show a product page and edit a product
         position: fixed;
         top: 0;
         left: 0;
-        height: 70px;
+        height: 55px;
       }
 
       .editable-alert .color-item{
@@ -167,11 +173,11 @@ Element to show a product page and edit a product
         <div class="layout vertical" hidden$="{{_editingAllProducts}}">
           <div>
             Editando os Produtos:
-            <span hidden$="[[!_product.selectedColor]]">Com a Cor</span>
-            <span hidden$="[[!_product.selectedColor.name]]" style="text-decoration: underline" >&nbsp[[_product.selectedColor.name]]&nbsp</span>
-            <span hidden$="[[!_product.selectedColor.hex]]" class="color-item" style$="background-color: {{_product.selectedColor.hex}}"></span>
-            <span hidden$="[[_product.selectedSize]]">e todos os tamanhos</span>
-            <span hidden$="[[!_product.selectedSize]]">Tamanho <span style="text-decoration: underline">[[_product.selectedSize]]</span></span>
+            <span hidden$="[[!_selectedColor.id]]">Com a Cor</span>
+            <span hidden$="[[!_selectedColor.name]]" style="text-decoration: underline" >&nbsp[[_selectedColor.name]]&nbsp</span>
+            <span hidden$="[[!_selectedColor.hex]]" class="color-item" style$="background-color: {{_selectedColor.hex}}"></span>
+            <span hidden$="[[_selectedSize]]">e todos os tamanhos</span>
+            <span hidden$="[[!_selectedSize]]">Tamanho <span style="text-decoration: underline">[[_selectedSize]]</span></span>
           </div>
           <div class="layout horizontal center" style="font-size: 12px">
             * Somente produtos com as caracteristicas acima serão alterados
@@ -206,13 +212,16 @@ Element to show a product page and edit a product
         </div>
         <acre-editable-product-size-selector class=" product-data"
           editable="[[editable]]"
+          selected-size="[[_selectedSize]]"
           sizes="{{_product.sizes}}"
-          selected-size="{{_product.selectedSize}}">
+          on-acre-product-size-selected="_onSizeSelected">
         </acre-editable-product-size-selector>
         <acre-editable-product-color-selector class="product-data"
           editable="[[editable]]"
           colors="{{_product.colors}}"
-          selected-color="{{_product.selectedColor}}"></acre-editable-product-color-selector>
+          selected-color="[[_selectedColor]]"
+          on-acre-product-color-selected="_onColorSelected"
+          on-acre-product-color-added="_onColorAdded"></acre-editable-product-color-selector>
         <span>Descrição</span>
         <acre-editable-input class="product-data product-description"
             editable="[[editable]]"
@@ -259,6 +268,10 @@ Element to show a product page and edit a product
       </div>
     </paper-dialog>
 
+    <paper-toast id="mainToast" duration="0" text="{{_toastMessage}}">
+      <paper-button onclick="mainToast.toggle()" class="yellow-button">Fechar</paper-button>
+    </paper-toast>
+
   </template>
 
   <script>
@@ -293,7 +306,7 @@ Element to show a product page and edit a product
               type: Array,
               value: function () {
               },
-              observer: '_productVariationsObservable'
+              observer: '_productVariationsObserver'
             },
 
             /**
@@ -302,6 +315,17 @@ Element to show a product page and edit a product
             _product: {
               type: Object,
               value: function () {
+              }
+            },
+
+            _selectedSize: {
+              type: String,
+              value: ''
+            },
+            _selectedColor: {
+              type: Object,
+              value: function(){
+                return {};
               }
             },
 
@@ -319,11 +343,13 @@ Element to show a product page and edit a product
             _editableMenuCollapsed: {
               type: Boolean,
               value: false
-            }
+            },
           },
 
           observers: [
             '_productObserver(_product.*)',
+            // '_productSizesObserver(_product.sizes)',
+            // '_productColorsObserver(_product.colors)',
           ],
 
           ready: function(){
@@ -338,75 +364,93 @@ Element to show a product page and edit a product
           */
           _productObserver: function (e) {
 
-            if (!this._product) return;
+            if(this.__lock) this.__lock = false; return;
+            if (!this._product || !this.productVariations || !this.productVariations.length) return;
 
             var indexes = [];
             var path = e.path.replace('_product', '').replace('#', '');
             var _this = this;
 
-            // changes the base product to reflect one product with the selected characteristics
-            if (path == '.selectedSize' || path == '.selectedColor') {
+            /*
+            * changes the base product to reflect one product with the selected characteristics
+            */
 
-              var matches = this.productVariations.filter(function (e, index) {
+            if (!this._selectedColor && !this._selectedSize) { // Update all products
 
-                var hasSize = _this._product.selectedSize ? e.size == _this._product.selectedSize : true;
-                var hasColor = _this._product.selectedColor ? e.color.hex == _this._product.selectedColor.hex : true;
+              indexes = this.productVariations.reduce((prev, next, idx) => {
+                prev.push(idx);
+                return prev;
+              }, []);
 
-                if (hasSize && hasColor) return index;
-              });
+            }
+            else if (path.indexOf('_product.colors.#') != -1) { // Update colors
+              //color changed
+              return;
+            }
+            else { // Update selectedProducts
 
-              if (matches.length)
-                this.generateProductFromVariations(this.productVariations.indexOf(matches[0]));
-              else
-                this.generateProductFromVariations();
+              indexes = this.productVariations.reduce((prev, next, idx) => {
+                var hasSize = _this._selectedSize ? next.size == _this._selectedSize : true;
+                var hasColor = _this._selectedColor ? next.color.id == _this._selectedColor.id : true;
 
-            } else {
-
-
-              // Update all products
-              if (!this._product.selectedColor && !this._product.selectedSize) {
-
-                indexes = this.productVariations.reduce((prev, next, idx) => {
+                if (hasSize && hasColor)
                   prev.push(idx);
-                  return prev;
-                }, []);
-                this.set('_editingAllProducts', true);
-              }
+                return prev;
+              }, []);
+            }
 
-              // Update selectedProducts
-              else {
-
-                indexes = this.productVariations.reduce((prev, next, idx) => {
-                  var hasSize = _this._product.selectedSize ? next.size == _this._product.selectedSize : true;
-                  var hasColor = _this._product.selectedColor ? next.color.hex == _this._product.selectedColor.hex : true;
-
-                  if (hasSize && hasColor)
-                    prev.push(idx);
-                  return prev;
-                }, []);
-
-                this.set('_editingAllProducts', false);
-              }
-
-              if (path) {
-                // console.log(`path: ${path}`);
-                indexes.forEach(x => {
-                  // console.log(`items: ${'productVariations.' + x + path}`);
-                  var value = isObj(e.value) ? Object.deepAssign({}, e.value) : e.value;
-                  this.set('productVariations.' + x + path, value);
-                });
-              }
+            if (path) {
+              // console.log(`path: ${path}`);
+              indexes.forEach(x => {
+                console.log(`items: ${'productVariations.' + x + path}`);
+                var value = isObj(e.value) ? Object.deepAssign({}, e.value) : e.value;
+                this.set('productVariations.' + x + path, value);
+              });
             }
           },
 
           /**
           * Occours when the variations list changes
           */
-          _productVariationsObservable: function(newValue, oldValue){
+          _productVariationsObserver: function(newValue, oldValue){
             if(newValue && newValue.length && !oldValue)
               this.generateProductFromVariations();
             else if(!this._product)
               this._product = {};
+          },
+
+          /**
+          * Occours when a color is added
+          */
+          _onColorAdded: function(e){
+            this.generateVariations();
+          },
+
+          /**
+          * Occours when a color is selected
+          */
+          _onColorSelected: function(e){
+            this.set('_selectedColor', e.detail.color);
+            this.set('_editingAllProducts', false);
+            this.generateProductFromVariations();
+          },
+
+          /**
+          * Occours when a size is selected
+          */
+          _onSizeSelected: function(e){console.log(e);
+            this.set('_selectedSize', e.detail.size);
+            this.set('_editingAllProducts', false);
+            this.generateProductFromVariations();
+          },
+
+          /**
+           * Set the selected properties to null
+           */
+          _clearSelectedData: function(){
+            this.set('_selectedColor', null);
+            this.set('_selectedSize', null);
+            this.set('_editingAllProducts', true);
           },
 
           /**
@@ -416,13 +460,6 @@ Element to show a product page and edit a product
             this.$.stockDialog.open();
           },
 
-          /**
-           * Set the selected properties to null
-           */
-          _clearSelectedData: function(){
-            this.set('_product.selectedColor', null);
-            this.set('_product.selectedSize', null);
-          },
 
           /**
           * The `acre-editable-product-page-save-click` event is fired whenever the save button is clicked
@@ -439,8 +476,17 @@ Element to show a product page and edit a product
           */
           generateProductFromVariations: function(baseProductIndex){
 
-            baseProductIndex = baseProductIndex || 0;
             var _this = this;
+
+            // check if the is a selected product to use as base for the editable product
+            var baseProducts = this._selectedColor || this._selectedSize ? this.productVariations.filter(function (e, index) {
+              var hasSize = _this._selectedSize ? e.size == _this._selectedSize : true;
+              var hasColor = _this._selectedColor ? e.color.id == _this._selectedColor.id : true;
+
+              if (hasSize && hasColor) return index;
+            }) : [];
+
+            baseProductIndex = baseProducts.length ? this.productVariations.indexOf(baseProducts[0]) : 0;
 
             if(this.productVariations && this.productVariations.length){
 
@@ -456,26 +502,14 @@ Element to show a product page and edit a product
 
                 if(variation.size && !product.sizes.filter(function(e){ return e == variation.size}).length)
                   product.sizes.push(variation.size);
-                if(variation.color){
 
-                  var hasColor = variation.color.name ? product.colors.filter(function(e){ return e.name == variation.color.name}).length :
-                                         product.colors.filter(function(e){ return e.hex == variation.color.hex}).length;
-
-                  if(!hasColor)
-                    product.colors.push(variation.color);
+                if(variation.color && !product.colors.filter(function(e){ return e.id == variation.color.id}).length){
+                  product.colors.push(variation.color);
                 }
-
               });
 
-              if(this._product){
-                product.selectedColor = this._product.selectedColor;
-                product.selectedSize = this._product.selectedSize;
-              }else{
-                product.selectedColor = null;
-                product.selectedSize = null;
-              }
-
               this._product = null;
+              this.set('__lock', true);
               this.set('_product', product);
             }else{
               this._product = {};
@@ -526,9 +560,7 @@ Element to show a product page and edit a product
                 var newVariation = Object.deepAssign({}, sizeItem, colorItem);
 
                 delete newVariation.sizes;
-                delete newVariation.selectedSize;
                 delete newVariation.colors;
-                delete newVariation.selectedColor;
 
                 // check if there is a variation with the same characteristics
                 var hasVariation = _this.productVariations.filter(function(e){
@@ -536,11 +568,7 @@ Element to show a product page and edit a product
                     var hasColor = false;
 
                     if(newVariation.color){
-                      if(e.color.name)
-                        hasColor = e.color.name == newVariation.color.name;
-                      else if(e.color.hex)
-                        hasColor = e.color.hex == newVariation.color.hex;
-
+                      hasColor = e.color.id == newVariation.color.id;
                     }
                     if(newVariation.size){
                       hasSize = e.size == newVariation.size;
@@ -558,6 +586,7 @@ Element to show a product page and edit a product
 
 
             this.productVariations = this.productVariations.concat(variations);
+            // console.log(JSON.stringify(this.productVariations));
             return this.productVariations;
           },
 

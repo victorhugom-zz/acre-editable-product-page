@@ -51,7 +51,13 @@
         <div class="layout vertical center color-container">
 
           <template is="dom-if" if={{editable}}>
-            <iron-icon class="icon" icon="remove" on-tap="_removeColor"></iron-icon>
+            <iron-icon class="icon"
+              hidden$="{{!_isNew(color)}}"
+              icon="remove"
+              on-tap="_removeColor"></iron-icon>
+            <iron-icon class="icon"
+              hidden$="{{_isNew(color)}}"
+              icon=""></iron-icon>
           </template>
 
           <div class="color-item layout horizontal center-justified "
@@ -91,6 +97,9 @@
         is: 'acre-editable-product-color-selector',
 
         properties: {
+          /**
+          * All selected colors
+          */
           colors: {
             type: Array,
             notify: true,
@@ -98,6 +107,18 @@
               return []
             },
           },
+
+          /**
+          * All the colors added
+          */
+          newColors: {
+             type: Array,
+            notify: true,
+            value: function () {
+              return []
+            },
+          },
+
           /**
            * Set if the product can be edited or not
            * @type Boolean
@@ -112,8 +133,7 @@
           */
           selectedColor: {
             type: String,
-            value: '',
-            notify: true
+            value: ''
           },
           /**
           * Set if the color are named or not
@@ -135,24 +155,48 @@
          */
         _selectColor: function (e) {
           this.set("selectedColor", e.model.color);
-          this.fire('acre-product-color-selected', { color: this.color });
+          this.fire('acre-product-color-selected', { color: e.model.color });
         },
 
         _isSelected: function (color, selectedColor) {
           return selectedColor && color == selectedColor;
         },
 
+        _isNew: function (color) {
+          return this.newColors.filter(function (x) {
+            return x.id == color.id;
+          }).length > 0;
+        },
+
+        /**
+         * The `acre-product-color-added` event is fired whenever a color is added to the list of colors
+         *
+         * @event acre-product-color-added
+         * @param {{color: color}} returns
+         */
         _addColor: function(e) {
           if(!this.colors || this.colors.length == 0)
             this.colors = [];
 
-          this.push('colors',{
+          var newColor = {
+            id: guid(),
             name: '',
             hex: '',
-          });
+          };
+
+          this.push('colors', newColor);
+          this.push('newColors', newColor);
+          this.fire('acre-product-color-added', {color: newColor});
         },
 
+        /**
+         * The `acre-product-color-removed` event is fired whenever a remove from added to the list of colors
+         *
+         * @event acre-product-color-removed
+         * @param {{color: color}} returns
+         */
         _removeColor: function(e) {
+          this.fire('acre-product-color-removed', {color: this.colors[e.model.index]});
           this.splice('colors', e.model.index, 1);
         }
       });
