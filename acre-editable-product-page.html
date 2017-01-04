@@ -498,17 +498,17 @@ Element to show a product page and edit a product
 
             var _this = this;
 
-            // check if the is a selected product to use as base for the editable product
-            var baseProducts = this._selectedColor || this._selectedSize ? this.productVariations.filter(function (e, index) {
-              var hasSize = _this._selectedSize ? e.size == _this._selectedSize : true;
-              var hasColor = _this._selectedColor ? e.color.id == _this._selectedColor.id : true;
-
-              if (hasSize && hasColor) return index;
-            }) : [];
-
-            baseProductIndex = baseProducts.length ? this.productVariations.indexOf(baseProducts[0]) : 0;
 
             if(this.productVariations && this.productVariations.length){
+              // check if the is a selected product to use as base for the editable product
+              var baseProducts = this._selectedColor || this._selectedSize ? this.productVariations.filter(function (e, index) {
+                var hasSize = _this._selectedSize ? e.size == _this._selectedSize : true;
+                var hasColor = _this._selectedColor ? e.color.id == _this._selectedColor.id : true;
+
+                if (hasSize && hasColor) return index;
+              }) : [];
+
+              baseProductIndex = baseProducts.length ? this.productVariations.indexOf(baseProducts[0]) : 0;
 
               // set base product
               var product = Object.deepAssign({}, this.productVariations[baseProductIndex]);
