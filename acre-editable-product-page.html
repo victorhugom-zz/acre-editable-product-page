@@ -261,8 +261,10 @@ Element to show a product page and edit a product
       entry-animation="scale-up-animation"
       exit-animation="fade-out-animation">
       <paper-dialog-scrollable>
-        <acre-editable-product-stock-table style="border-bottom: 1px solid #e0e0e0; max-height: 400px;"
-        product-variations="{{productVariations}}"></acre-editable-product-stock-table>
+        <acre-editable-product-stock-table
+        id="stockTable"
+        style="border-bottom: 1px solid #e0e0e0; max-height: 400px;">
+        </acre-editable-product-stock-table>
       </paper-dialog-scrollable>
       <paper-button class="dialog-close-button" dialog-dismiss>Fechar</paper-button>
       </div>
@@ -348,8 +350,6 @@ Element to show a product page and edit a product
 
           observers: [
             '_productObserver(_product.*)',
-            // '_productSizesObserver(_product.sizes)',
-            // '_productColorsObserver(_product.colors)',
           ],
 
           ready: function(){
@@ -364,7 +364,7 @@ Element to show a product page and edit a product
           */
           _productObserver: function (e) {
 
-            if(this.__lock) this.__lock = false; return;
+            if(this.__lock) {this.__lock = false; return;}
             if (!this._product || !this.productVariations || !this.productVariations.length) return;
 
             var indexes = [];
@@ -375,6 +375,28 @@ Element to show a product page and edit a product
             * changes the base product to reflect one product with the selected characteristics
             */
 
+             if (path.match(/colors\.\d*\.hex/)) { // Update colors
+              var changedColor = this._product.colors[parseInt(path.replace(".colors.", '')[0])];
+
+              this.productVariations.forEach(function(variation, index){
+                if(changedColor.id == variation.color.id){
+                  _this.set('productVariations.' + index + '.color.hex', e.value);
+                  // variation.color.hex = e.value;
+                }
+              })
+              return;
+            }
+            else if (path.match(/colors\.\d*\.name/)){
+              var changedColor = this._product.colors[parseInt(path.replace(".colors.", '')[0])];
+
+              this.productVariations.forEach(function(variation){
+                if(changedColor.id == variation.color.id){
+                  _this.set('productVariations.' + index + '.color.name', e.value);
+                }
+              })
+              return;
+            }
+
             if (!this._selectedColor && !this._selectedSize) { // Update all products
 
               indexes = this.productVariations.reduce((prev, next, idx) => {
@@ -382,10 +404,6 @@ Element to show a product page and edit a product
                 return prev;
               }, []);
 
-            }
-            else if (path.indexOf('_product.colors.#') != -1) { // Update colors
-              //color changed
-              return;
             }
             else { // Update selectedProducts
 
@@ -402,7 +420,7 @@ Element to show a product page and edit a product
             if (path) {
               // console.log(`path: ${path}`);
               indexes.forEach(x => {
-                console.log(`items: ${'productVariations.' + x + path}`);
+                // console.log(`items: ${'productVariations.' + x + path}`);
                 var value = isObj(e.value) ? Object.deepAssign({}, e.value) : e.value;
                 this.set('productVariations.' + x + path, value);
               });
@@ -438,7 +456,7 @@ Element to show a product page and edit a product
           /**
           * Occours when a size is selected
           */
-          _onSizeSelected: function(e){console.log(e);
+          _onSizeSelected: function(e){
             this.set('_selectedSize', e.detail.size);
             this.set('_editingAllProducts', false);
             this.generateProductFromVariations();
@@ -457,6 +475,7 @@ Element to show a product page and edit a product
           * Shows the modal to edit the stock
           */
           _editStock: function(){
+            this.$.stockTable.productVariations = this.productVariations;
             this.$.stockDialog.open();
           },
 
@@ -508,8 +527,8 @@ Element to show a product page and edit a product
                 }
               });
 
-              this._product = null;
               this.set('__lock', true);
+              this._product = null;
               this.set('_product', product);
             }else{
               this._product = {};

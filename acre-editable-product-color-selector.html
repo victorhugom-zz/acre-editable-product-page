@@ -40,6 +40,10 @@
         cursor: pointer;
       }
 
+      .check-icon {
+        --iron-icon-stroke-color: #d2d2d2;
+      }
+
     </style>
 
     <div class="data-label">Cores:</div>
@@ -60,11 +64,11 @@
               icon=""></iron-icon>
           </template>
 
-          <div class="color-item layout horizontal center-justified "
+          <div class="color-item layout horizontal center-justified"
             style="background-color: [[color.hex]]; position: relative"
             on-tap="_selectColor">
             <iron-icon icon="check"
-              class="layout self-center"
+              class="check-icon layout self-center"
               hidden$="{{!_isSelected(color, selectedColor)}}"
               style="color: white;"></iron-icon>
               <paper-ripple></paper-ripple>
@@ -83,8 +87,9 @@
       </template>
 
       <template is="dom-if" if="{{editable}}">
-        <div class="color-item" style="margin-top: 30px; margin-left: 5px">
-          <iron-icon class="icon" icon="add" on-tap="_addColor"></iron-icon>
+        <div class="color-item layout horizontal center-justified" style="margin-top: 30px; margin-left: 5px">
+          <iron-icon class="icon layout self-center"
+           icon="add" on-tap="_addColor"></iron-icon>
         </div>
       </template>
     </div>

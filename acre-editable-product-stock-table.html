@@ -22,12 +22,12 @@
     <paper-datatable data="{{productVariations}}">
         <paper-datatable-column header="SKU" property="sku" editable></paper-datatable-column>
         <paper-datatable-column header="Nome" property="name"></paper-datatable-column>
-        <paper-datatable-column header="Cor" property="color">
+        <paper-datatable-column header="Cor" property="color" type="Object" sortable sorted sort="{{hexSort}}">
           <template>
             <span class="color-item" style$="height: 30px;width: 100%;margin: 0;display: block;background-color: {{value.hex}}"></span>
           </template>
         </paper-datatable-column>
-        <paper-datatable-column header="Tamanho" property="size" sorted></paper-datatable-column>
+        <paper-datatable-column header="Tamanho" property="size" sortable sort="{{sizeSort}}"></paper-datatable-column>
         <paper-datatable-column header="Estoque" property="stock" type="Number" editable></paper-datatable-column>
         <paper-datatable-column header="Preço" property="price"></paper-datatable-column>
     </paper-datatable>
@@ -44,10 +44,31 @@
         */
         productVariations: {
           type: Array,
+          notify: true,
           value: function () {
           },
         },
-      }
+
+        hexSort: {
+          type: Object,
+          value: function () {
+            return function (a, b) {
+              if (a.hex === b.hex) return 0;
+              return a.hex < b.hex ? -1 : 1;
+            }
+          }
+        },
+
+        sizeSort:{
+          type: Object,
+          value: function(){
+            return function(a,b){
+              if (a === b) return 0;
+              return a < b ? -1 : 1;
+            }
+          }
+        }
+      },
     });
   </script>
 </dom-module>
