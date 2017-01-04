@@ -43,6 +43,7 @@
         height: 30px;
         width: 30px;
         color: #7d7d7d;
+        cursor: pointer;
       }
     </style>
 
@@ -68,7 +69,7 @@
 
         <template is="dom-if" if={{editable}}>
           <div style="position: absolute; top: 5px; left: 5px;" hidden=[[!_imageSelected]]>
-            <iron-icon icon="clear" on-tap="_removeImage"></iron-icon>
+            <iron-icon class="icon" icon="clear" on-tap="_removeImage"></iron-icon>
           </div>
           <div class="image-selector">
             <iron-icon class="icon" icon="add" on-tap="_addImage"></iron-icon>
@@ -179,7 +180,7 @@
       * Remove a image from the list of images
       */
       _removeImage: function(e){
-        if(this.images.length > 1){
+        if(this.images.length > 0){
           var index = this.images.indexOf(this._imageSelected);
           this.splice('images', index, 1);
           this.set('_imageSelected', this.images[0]);
