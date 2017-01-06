@@ -95,20 +95,10 @@ Element to show a product page and edit a product
 
       }
 
-      @media only screen and (max-device-width: 768px) {
-        .buy-button {
-          width: 100%;
-          position: fixed;
-          bottom: 0;
-          margin: 0;
-          left: 0;
-        }
+      .yellow-button {
+        text-transform: none;
+        color: #eeff41;
       }
-
-       .yellow-button {
-          text-transform: none;
-          color: #eeff41;
-        }
 
       .editable-menu {
         width: 100%;
@@ -148,10 +138,10 @@ Element to show a product page and edit a product
         background-color: #FFCC00;
         font-weight: 500;
         color: black;
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
-        height: 55px;
+        min-height: 55px;
         z-index: 3;
       }
 
@@ -159,6 +149,29 @@ Element to show a product page and edit a product
         height:10px;
         margin: 0 5px;
         display: inline-block;
+      }
+
+      @media (max-width: 600px) {
+        .buy-button {
+          width: 100%!important;
+          position: fixed!important;
+          bottom: 0;
+          margin: 0;
+          left: 0;
+        }
+
+        acre-editable-image-input-list {
+          margin: 0!important;
+          padding: 10px!important;
+          min-width: 300px!important;
+        }
+
+        .product-data-container {
+          margin: 20px 0 0 0!important;
+          min-width: 300px!important;
+          width: 100%!important;
+          max-width: 100%!important;
+        }
       }
     </style>
 
@@ -264,6 +277,7 @@ Element to show a product page and edit a product
       <paper-dialog-scrollable>
         <acre-editable-product-stock-table
         id="stockTable"
+        product-variations="{{productVariations}}"
         style="border-bottom: 1px solid #e0e0e0; max-height: 400px;">
         </acre-editable-product-stock-table>
       </paper-dialog-scrollable>
@@ -476,7 +490,7 @@ Element to show a product page and edit a product
           * Shows the modal to edit the stock
           */
           _editStock: function(){
-            this.$.stockTable.productVariations = this.productVariations;
+            // this.$.stockTable.productVariations = this.productVariations;
             this.$.stockDialog.open();
           },
 
