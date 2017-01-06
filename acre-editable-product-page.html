@@ -228,7 +228,8 @@ Element to show a product page and edit a product
           editable="[[editable]]"
           selected-size="[[_selectedSize]]"
           sizes="{{_product.sizes}}"
-          on-acre-product-size-selected="_onSizeSelected">
+          on-acre-product-size-selected="_onSizeSelected"
+          on-acre-product-size-added="_onSizeAdded">
         </acre-editable-product-size-selector>
         <acre-editable-product-color-selector class="product-data"
           editable="[[editable]]"
@@ -456,7 +457,16 @@ Element to show a product page and edit a product
           * Occours when a color is added
           */
           _onColorAdded: function(e){
-            this.generateVariations();
+            if(this._product.sizes)
+              this.generateVariations();
+          },
+
+          /**
+          * Occours when a size is added
+          */
+          _onSizeAdded: function(e){
+            if(this._product.colors)
+              this.generateVariations();
           },
 
           /**

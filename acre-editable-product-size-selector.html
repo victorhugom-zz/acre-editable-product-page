@@ -158,6 +158,12 @@
           return size == selectedSize;
         },
 
+         /**
+         * The `acre-product-size-added` event is fired whenever a size is added to the list of sizes
+         *
+         * @event acre-product-size-added
+         * @param {{size: size}} returns
+         */
         _addSizeToList: function (e) {
           var selectedSize = this._availableSizes[e.model.index];
           var selected = !selectedSize.selected;
@@ -173,6 +179,7 @@
             }, []);
 
           this.set('sizes', sizesSelected)
+          this.fire('acre-product-size-added', {size: selectedSize});
         },
 
         _openDialog: function (e) {
