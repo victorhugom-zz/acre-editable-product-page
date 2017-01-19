@@ -206,7 +206,8 @@ Element to show a product page and edit a product
       <acre-editable-image-input-list class="flex"
           images="{{_product.images}}"
           editable="[[editable]]"
-          on-images-changed="_onImagesChanged"></acre-editable-image-input-list>
+          on-acre-editable-image-list-item-changed="_onImageChanged"
+          on-acre-editable-image-list-item-removed="_onImageRemoved"></acre-editable-image-input-list>
       <div class="layout vertical flex product-data-container">
         <acre-editable-input class="product-data product-name"
             editable="[[editable]]"
@@ -483,23 +484,40 @@ Element to show a product page and edit a product
           },
 
           /**
-           * Occours when a image changes, is added, or removed
+           * Occours when an image changes or is added
            */
-          _onImagesChanged: function (e) {
+          _onImageChanged: function (e) {
 
             if (this.__lock || !this._product) { this.__lock = false; return; }
             var _this = this;
 
-            if (e.detail.path) {
-              var imageChangedIndex = parseInt(e.detail.path.replace("images.#", "")[0]);
-            }
+            var imageChangedIndex = e.detail.index;
+            var image = e.detail.image;
 
             if (imageChangedIndex >= 0) {
-              var image = this._product.images[imageChangedIndex];
-              indexes = this.getSelectedItemsIndex();
 
+              indexes = this.getSelectedItemsIndex();
               indexes.forEach(x => {
-                _this.set('productVariations.' + x + ".images." + imageChangedIndex, image);
+                  _this.set('productVariations.' + x + ".images." + imageChangedIndex, image);
+              });
+            }
+          },
+
+          /**
+          * Occours when an image is removed
+          */
+          _onImageRemoved: function(e){
+             if (this.__lock || !this._product) { this.__lock = false; return; }
+            var _this = this;
+
+            var imageChangedIndex = e.detail.index;
+
+            if (imageChangedIndex >= 0) {
+
+              indexes = this.getSelectedItemsIndex();
+              indexes.forEach(x => {
+                  _this.splice('productVariations.' + x + ".images", this._imageSelectedIndex, 1);
+
               });
             }
           },

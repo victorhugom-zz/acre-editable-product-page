@@ -112,44 +112,35 @@
         },
       },
 
-      observers: [
-        '_imageSelectedObserver(_imageSelected.*)',
-      ],
-
       /**
       * Occours when the image list changes,
       * if there is just on image, set this one as selected
       */
       _imagesObservable: function(newValue, oldValue){
-         if(this.images && this.images.length > 0 && !oldValue){
-          this.set('_imageSelected', this.images[0]);
+         if( !oldValue && this.images && this.images.length > 0
+        && !this._imageSelected
+        && (this._imageSelectedIndex == undefined || this._imageSelectedIndex == null)){
           this._imageSelectedIndex = 0;
+          this.set('_imageSelected', this.images[0]);
          }
       },
 
       /**
-      * Occours when the selected image changes,
-      * set the changes to the image insize the arrray
+      * The `acre-editable-image-list-item-changed` event is fired whenever an items from the image list changes
+      *
+      * @event acre-editable-image-list-item-changed
+      * @detail {{index: index: image: image}}
+      * @returns the index of the image and the actual image
       */
-      _imageSelectedObserver: function(e){
-
-        if(!this.images) return;
-
-        if(!this._imageSelectedIndex){
-          var path = e.path.replace('_imageSelected', '');
-          this.set('images.' + this._imageSelectedIndex + path, e.value);
-        }
-      },
-
       /**
       * Occours when the image changes,
       * trigger the observers to update the images list
       */
       _imageChanged: function(e) {
-        var index = this.images.indexOf(this._imageSelected);
-        if (index != -1) {
-          //not beautifull but everyting else wasnt working
-          this.set("images." + index + ".url", this._imageSelected.url);
+        if (this._imageSelectedIndex >= 0) {
+          this.set("images." + this._imageSelectedIndex, this._imageSelected);
+          this.set("images." + this._imageSelectedIndex + ".url", this._imageSelected.url); //set url changes
+          this.fire("acre-editable-image-list-item-changed", {index : this._imageSelectedIndex, image: this._imageSelected});
         }
       },
 
@@ -164,25 +155,37 @@
           positionY: 0,
           url: '',
         });
-        this.set('_imageSelected', this.images[this.images.length -1]);
+
+        // select the new image
         this._imageSelectedIndex = this.images.length -1;
+        this.set('_imageSelected', this.images[this.images.length -1]);
       },
 
       /**
       * When an user tap a image in the list set it as selected
       */
       _selectImage: function(e){
-         this.set('_imageSelected', this.images[e.model.index]);
          this._imageSelectedIndex  = e.model.index;
+         this.set('_imageSelected', this.images[e.model.index]);
       },
 
+
+      /**
+      * The `acre-editable-image-list-item-removed` event is fired whenever an items from the image list changes
+      *
+      * @event acre-editable-image-list-item-removed
+      * @detail {{index: index: image: image}}
+      * @returns the index of the image and the actual image
+      */
       /**
       * Remove a image from the list of images
       */
-      _removeImage: function(e){
-        if(this.images.length > 0){
-          var index = this.images.indexOf(this._imageSelected);
-          this.splice('images', index, 1);
+      _removeImage: function (e) {
+        if (this.images.length > 0) {
+          this.fire("acre-editable-image-list-item-removed", { index: this._imageSelectedIndex, image: this._imageSelected });
+
+          this.splice('images', this._imageSelectedIndex, 1);
+          this.set('_imageSelectedIndex', 0);
           this.set('_imageSelected', this.images[0]);
         }
       },
