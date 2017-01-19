@@ -205,7 +205,8 @@ Element to show a product page and edit a product
     <div class="product-page-container" editing$="[[editable]]">
       <acre-editable-image-input-list class="flex"
           images="{{_product.images}}"
-          editable="[[editable]]"></acre-editable-image-input-list>
+          editable="[[editable]]"
+          on-images-changed="_onImagesChanged"></acre-editable-image-input-list>
       <div class="layout vertical flex product-data-container">
         <acre-editable-input class="product-data product-name"
             editable="[[editable]]"
@@ -343,7 +344,7 @@ Element to show a product page and edit a product
             _selectedColor: {
               type: Object,
               value: function(){
-                return {};
+                return null;
               }
             },
 
@@ -380,17 +381,19 @@ Element to show a product page and edit a product
           */
           _productObserver: function (e) {
 
-            if(this.__lock) {this.__lock = false; return;}
+            if (this.__lock) { this.__lock = false; return; }
             if (!this._product || !this.productVariations || !this.productVariations.length) return;
 
             var indexes = [];
             var path = e.path.replace('_product', '').replace('#', '');
             var _this = this;
 
+            // doesn`t change images as part of the product
+            if(path.match("\.?images\..*"))return;
+
             /*
             * changes the base product to reflect one product with the selected characteristics
             */
-
              if (path.match(/colors\.\d*\.hex/)) { // Update colors
               var changedColor = this._product.colors[parseInt(path.replace(".colors.", '')[0])];
 
@@ -409,10 +412,9 @@ Element to show a product page and edit a product
                 if(changedColor.id == variation.color.id){
                   _this.set('productVariations.' + index + '.color.name', e.value);
                 }
-              })
+              });
               return;
             }
-
             if (!this._selectedColor && !this._selectedSize) { // Update all products
 
               indexes = this.productVariations.reduce((prev, next, idx) => {
@@ -423,14 +425,7 @@ Element to show a product page and edit a product
             }
             else { // Update selectedProducts
 
-              indexes = this.productVariations.reduce((prev, next, idx) => {
-                var hasSize = _this._selectedSize ? next.size == _this._selectedSize : true;
-                var hasColor = _this._selectedColor ? next.color.id == _this._selectedColor.id : true;
-
-                if (hasSize && hasColor)
-                  prev.push(idx);
-                return prev;
-              }, []);
+              indexes = this.getSelectedItemsIndex();
             }
 
             if (path) {
@@ -485,6 +480,28 @@ Element to show a product page and edit a product
             this.set('_selectedSize', e.detail.size);
             this.set('_editingAllProducts', false);
             this.generateProductFromVariations();
+          },
+
+          /**
+           * Occours when a image changes, is added, or removed
+           */
+          _onImagesChanged: function (e) {
+
+            if (this.__lock || !this._product) { this.__lock = false; return; }
+            var _this = this;
+
+            if (e.detail.path) {
+              var imageChangedIndex = parseInt(e.detail.path.replace("images.#", "")[0]);
+            }
+
+            if (imageChangedIndex >= 0) {
+              var image = this._product.images[imageChangedIndex];
+              indexes = this.getSelectedItemsIndex();
+
+              indexes.forEach(x => {
+                _this.set('productVariations.' + x + ".images." + imageChangedIndex, image);
+              });
+            }
           },
 
           /**
@@ -632,6 +649,20 @@ Element to show a product page and edit a product
             this.productVariations = this.productVariations.concat(variations);
             // console.log(JSON.stringify(this.productVariations));
             return this.productVariations;
+          },
+
+          getSelectedItemsIndex: function () {
+            var _this = this;
+            indexes = this.productVariations.reduce((prev, next, idx) => {
+              var hasSize = _this._selectedSize ? next.size == _this._selectedSize : true;
+              var hasColor = _this._selectedColor ? next.color.id == _this._selectedColor.id : true;
+
+              if (hasSize && hasColor)
+                prev.push(idx);
+              return prev;
+            }, []);
+
+            return indexes;
           },
 
           _toggleEditableMenu: function(){
