@@ -117,11 +117,12 @@
       * if there is just on image, set this one as selected
       */
       _imagesObservable: function(newValue, oldValue){
-         if( !oldValue && this.images && this.images.length > 0
-        && !this._imageSelected
-        && (this._imageSelectedIndex == undefined || this._imageSelectedIndex == null)){
+         if( !oldValue && this.images && this.images.length > 0){
           this._imageSelectedIndex = 0;
           this.set('_imageSelected', this.images[0]);
+         }else{
+            this._imageSelectedIndex = null;
+            this.set('_imageSelected', null);
          }
       },
 
@@ -137,7 +138,7 @@
       * trigger the observers to update the images list
       */
       _imageChanged: function(e) {
-        if (this._imageSelectedIndex >= 0) {
+        if (this._imageSelectedIndex != null && this._imageSelectedIndex != undefined && this._imageSelectedIndex >= 0) {
           this.set("images." + this._imageSelectedIndex, this._imageSelected);
           this.set("images." + this._imageSelectedIndex + ".url", this._imageSelected.url); //set url changes
           this.fire("acre-editable-image-list-item-changed", {index : this._imageSelectedIndex, image: this._imageSelected});

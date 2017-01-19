@@ -237,6 +237,7 @@ Element to show a product page and edit a product
           editable="[[editable]]"
           colors="{{_product.colors}}"
           selected-color="[[_selectedColor]]"
+          show-color-labels="[[showColorLabels]]"
           on-acre-product-color-selected="_onColorSelected"
           on-acre-product-color-added="_onColorAdded"></acre-editable-product-color-selector>
         <span>Descrição</span>
@@ -319,6 +320,14 @@ Element to show a product page and edit a product
             },
 
             /**
+            * Set if the color are named or not
+            */
+            showColorLabels: {
+              type: Boolean,
+              value: false
+            },
+
+            /**
             * All product variations, you must use this property to set
             * the product data
             */
@@ -390,7 +399,7 @@ Element to show a product page and edit a product
             var _this = this;
 
             // doesn`t change images as part of the product
-            if(path.match("\.?images\..*"))return;
+            if(path.match("\.?images\..*")) return;
 
             /*
             * changes the base product to reflect one product with the selected characteristics
@@ -534,7 +543,7 @@ Element to show a product page and edit a product
           /**
           * Shows the modal to edit the stock
           */
-          _editStock: function(){
+          _editStock: function() {
             // this.$.stockTable.productVariations = this.productVariations;
             this.$.stockDialog.open();
           },
@@ -553,7 +562,7 @@ Element to show a product page and edit a product
           /**
           * Generate a unique product from the variations passed by parameter
           */
-          generateProductFromVariations: function(baseProductIndex){
+          generateProductFromVariations: function(baseProductIndex) {
 
             var _this = this;
 
