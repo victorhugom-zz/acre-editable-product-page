@@ -3,8 +3,6 @@
   "main": "acre-editable-product-page.html",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
-    "acre-editable-input": "https://github.com/victorhugom/acre-editable-input.git",
-    "acre-editable-image-input": "https://github.com/victorhugom/acre-editable-input-image.git",
     "paper-card": "PolymerElements/paper-card#^1.1.4",
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.4.2",
     "paper-button": "PolymerElements/paper-button#^1.0.14",
