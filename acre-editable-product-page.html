@@ -52,10 +52,6 @@ Element to show a product page and edit a product
         max-width: 300px;
       }
 
-      .product-page-container[editing]{
-        margin-top: 100px;
-      }
-
       .product-data {
         margin: 10px 0;
         min-width: 300px;
@@ -125,24 +121,17 @@ Element to show a product page and edit a product
       }
 
       .editable-header {
-        padding: 20px;
         color: black;
         border-bottom: 1px solid #c5c5c5;
       }
 
       .editable-alert {
-        padding: 7px 20px;
+        padding: 15px;
         width: 100%;
-        margin-bottom: 30px;
         line-height: 20px;
         background-color: #FFCC00;
         font-weight: 500;
         color: black;
-        position: absolute;
-        top: 0;
-        left: 0;
-        min-height: 55px;
-        z-index: 3;
       }
 
       .editable-alert .color-item{
@@ -175,34 +164,8 @@ Element to show a product page and edit a product
       }
     </style>
 
-    <!--Editing Alert-->
-     <template is="dom-if" if={{editable}}>
-      <paper-card class="editable-alert" hidden$="[[!editable]]">
-        <div class="layout vertical" hidden$="{{!_editingAllProducts}}">
-          <div class="layout horizontal center">Editando todos os produtos</div>
-          <div class="layout horizontal center" style="font-size: 12px;">
-            * Qualquer alteração feita vai afetar todos os produtos, para editar um produto específico selecione uma cor e/ou tamanho.
-          </div>
-        </div>
-        <div class="layout vertical" hidden$="{{_editingAllProducts}}">
-          <div>
-            Editando os Produtos:
-            <span hidden$="[[!_selectedColor.id]]">Com a Cor</span>
-            <span hidden$="[[!_selectedColor.name]]" style="text-decoration: underline" >&nbsp[[_selectedColor.name]]&nbsp</span>
-            <span hidden$="[[!_selectedColor.hex]]" class="color-item" style$="background-color: {{_selectedColor.hex}}"></span>
-            <span hidden$="[[_selectedSize]]">e todos os tamanhos</span>
-            <span hidden$="[[!_selectedSize]]">Tamanho <span style="text-decoration: underline">[[_selectedSize]]</span></span>
-          </div>
-          <div class="layout horizontal center" style="font-size: 12px">
-            * Somente produtos com as caracteristicas acima serão alterados
-            <paper-button class="link-button" style="height: 10px;" on-tap="_clearSelectedData">Editar Todos</paper-button>
-          </div>
-        </div>
-      </paper-card>
-    </template>
-
-    <!--Product Data-->
-    <div class="product-page-container" editing$="[[editable]]">
+     <!--Product Data-->
+    <div class="product-page-container">
       <acre-editable-image-input-list class="flex"
           images="{{_product.images}}"
           editable="[[editable]]"
@@ -260,7 +223,28 @@ Element to show a product page and edit a product
         </div>
         <paper-card style="width: 100%">
           <div class="editable-header layout vertical">
-            Editando - {{_product.name}}
+            <div class="editable-alert" hidden$="[[!editable]]">
+              <div class="layout vertical" hidden$="{{!_editingAllProducts}}">
+                <div class="layout horizontal center">Editando todos os produtos</div>
+                <div class="layout horizontal center" style="font-size: 12px;">
+                  * Qualquer alteração feita vai afetar todos os produtos, para editar um produto específico selecione uma cor e/ou tamanho.
+                </div>
+              </div>
+              <div class="layout vertical" hidden$="{{_editingAllProducts}}">
+                <div class="layout horizontal wrap">
+                  Editando os Produtos:
+                  <span hidden$="[[!_selectedColor.id]]">Com a Cor</span>
+                  <span hidden$="[[!_selectedColor.name]]" style="text-decoration: underline" >&nbsp[[_selectedColor.name]]&nbsp</span>
+                  <span hidden$="[[!_selectedColor.hex]]" class="color-item" style$="background-color: {{_selectedColor.hex}}"></span>
+                  <span hidden$="[[_selectedSize]]">e todos os tamanhos</span>
+                  <span hidden$="[[!_selectedSize]]">Tamanho <span style="text-decoration: underline">[[_selectedSize]]</span></span>
+                </div>
+                <div class="layout horizontal center" style="font-size: 12px">
+                  * Somente produtos com as caracteristicas acima serão alterados
+                  <paper-button class="link-button" style="height: 10px;" on-tap="_clearSelectedData">Editar Todos</paper-button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="card-content">
             <paper-checkbox checked="{{editable}}">Editar Produto</paper-checkbox>
